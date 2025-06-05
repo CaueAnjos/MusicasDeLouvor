@@ -22,7 +22,14 @@ class Program
             await GetCommand_Handler(titulo, autor);
         }, tituloOption, autorOption);
 
+        var compileCommand = new Command("compile", "Compila os arquivos de músicas de Louvor");
+        compileCommand.SetHandler(async () =>
+        {
+            await CompileCommand_Handler();
+        });
+
         rootCommand.AddCommand(getCommand);
+        rootCommand.AddCommand(compileCommand);
 
         return await rootCommand.InvokeAsync(args);
     }
@@ -58,5 +65,11 @@ class Program
         }
         else
             Notify.Error("Letra não encontrada");
+    }
+
+    public static async Task CompileCommand_Handler()
+    {
+        PresentationCompiler compiler = new();
+        await compiler.CompileAllAsync();
     }
 }
