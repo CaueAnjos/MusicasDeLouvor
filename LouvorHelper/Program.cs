@@ -30,8 +30,20 @@ class Program
     {
         Notify.Info($"Buscando letra para: {titulo} {"de " + autor}");
 
-        IProvider provider = new VagalumeProvider();
-        string? lyrics = await provider.GetLyrics(titulo, autor);
+        List<IProvider> providers =
+        [
+            new VagalumeProvider(),
+            new CifraClubProvider()
+        ];
+
+        List<Task<string?>> tasks =
+        [
+            providers[0].GetLyrics(titulo, autor),
+            providers[1].GetLyrics(titulo, autor)
+        ];
+
+        string? lyrics = await Task.WhenAny(tasks).Result;
+
         if (lyrics is not null)
         {
             Notify.Success("Letra encontrada");
