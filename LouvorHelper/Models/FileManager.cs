@@ -4,13 +4,13 @@ namespace LouvorHelper.Models;
 
 internal class FileManager
 {
-    private string path = "../Musicas";
+    public string Path { get; private set; } = System.IO.Path.GetFullPath("../Musicas");
 
     public async Task Save(Music music)
     {
         string formattedTitle = music.Titulo.ToUpper().Replace(' ', '_').Trim();
         string formattedArtist = music.Titulo.ToUpper().Replace(' ', '_').Trim();
-        string filePath = Path.Combine(path, $"{formattedTitle}-{formattedArtist}.json");
+        string filePath = System.IO.Path.Combine(Path, $"{formattedTitle}-{formattedArtist}.json");
 
         JsonSerializerOptions options = new();
         options.WriteIndented = true;
@@ -18,7 +18,7 @@ internal class FileManager
 
         string json = JsonSerializer.Serialize(music, options);
 
-        Directory.CreateDirectory(path);
+        Directory.CreateDirectory(Path);
         await File.WriteAllTextAsync(filePath, json);
     }
 }
