@@ -6,7 +6,7 @@ internal class FileManager
 {
     public string Path { get; private set; } = System.IO.Path.GetFullPath("../Musicas");
 
-    public async Task Save(Music music)
+    public async Task SaveAsync(Music music)
     {
         string formattedTitle = music.Titulo.ToUpper().Replace(' ', '_').Trim();
         string formattedArtist = music.Artista.ToUpper().Replace(' ', '_').Trim();

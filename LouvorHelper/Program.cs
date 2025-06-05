@@ -38,7 +38,7 @@ class Program
 
             Music music = new(titulo, autor, lyrics);
             FileManager fileManager = new();
-            await fileManager.Save(music);
+            await fileManager.SaveAsync(music);
 
             Notify.Success($"Arquivo salvo em: {fileManager.Path}");
         }
