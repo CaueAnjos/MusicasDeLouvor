@@ -10,7 +10,9 @@ internal class VagalumeProvider : IProvider
         HttpClient client = new();
         try
         {
-            string text = await client.GetStringAsync($"https://www.vagalume.com.br/{artist}/{title}.html");
+
+            string url = $"https://www.vagalume.com.br/{PrepareString(artist)}/{PrepareString(title)}.html";
+            string text = await client.GetStringAsync(url);
 
             var match = Regex.Match(text, @"<div id=lyrics[^>]*>(.*?)</div>", RegexOptions.Singleline);
             if (!match.Success)

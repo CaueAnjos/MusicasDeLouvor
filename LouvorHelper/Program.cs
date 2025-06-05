@@ -42,5 +42,7 @@ class Program
 
             Notify.Success($"Arquivo salvo em: {fileManager.Path}");
         }
+        else
+            Notify.Error("Letra não encontrada");
     }
 }
