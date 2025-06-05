@@ -1,3 +1,5 @@
+using Dumpify;
+
 namespace LouvorHelper.Models;
 
 static class Notify
@@ -32,5 +34,15 @@ static class Notify
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine(message);
         Console.ForegroundColor = color;
+    }
+
+    public static void ObjectDump(Object? obj)
+    {
+        if (obj is null)
+        {
+            Notify.Error("Object is null");
+            return;
+        }
+        obj.Dump();
     }
 }
