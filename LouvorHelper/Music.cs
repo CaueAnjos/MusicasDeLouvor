@@ -9,6 +9,7 @@ class Music
         Letra = letra;
     }
 
+    // TODO: use english names
     public string Titulo { get; set; }
     public string Artista { get; set; }
     public string Letra { get; set; }

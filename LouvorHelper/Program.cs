@@ -12,6 +12,7 @@ class Program
         var tituloOption = new Option<string>(["--titulo", "-t"], "O título da música") { IsRequired = true };
         var autorOption = new Option<string>(["--autor", "-a"], "O nome do autor") { IsRequired = true };
 
+        // TODO: put it in a class
         var getCommand = new Command("get", "Faz o download dos arquivos de músicas de Louvor");
         getCommand.AddOption(tituloOption);
         getCommand.AddOption(autorOption);
@@ -30,7 +31,7 @@ class Program
     {
         Notify.Info($"Buscando letra para: {titulo} {"de " + autor}");
 
-        // TODO: Adicionar mais provedores: Letras.Mus.br
+        // TODO: add more providers: Letras.Mus.br
         List<IProvider> providers =
         [
             new VagalumeProvider(),
