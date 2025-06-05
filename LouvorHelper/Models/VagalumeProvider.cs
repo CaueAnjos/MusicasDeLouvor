@@ -19,7 +19,6 @@ internal class VagalumeProvider : IProvider
 
             string rawLyrics = match.Groups[1].Value;
 
-            // rawLyrics = Regex.Replace(rawLyrics, @"<div[^>]*>.*?</div>", "", RegexOptions.Singleline);
             rawLyrics = Regex.Replace(rawLyrics, @"<[^>]+>", "\n"); // <br> → \n
             rawLyrics = Regex.Replace(rawLyrics, @"\n{2,}", "\n\n"); // Múltiplas quebras → 2 quebras
 
