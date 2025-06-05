@@ -10,7 +10,7 @@ internal class CifraClubProvider : IProvider
         HttpClient client = new();
         try
         {
-            string url = $"https://www.cifraclub.com.br/{PrepareString(artist)}/{PrepareString(title)}.html";
+            string url = $"https://www.cifraclub.com.br/{PrepareString(artist)}/{PrepareString(title)}/";
             string text = await client.GetStringAsync(url);
 
             var match = Regex.Match(text, @"<pre>(.*?)</pre>", RegexOptions.Singleline);

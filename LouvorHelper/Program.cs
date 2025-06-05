@@ -42,7 +42,7 @@ class Program
             providers[1].GetLyrics(titulo, autor)
         ];
 
-        string? lyrics = await Task.WhenAny(tasks).Result;
+        string? lyrics = Task.WhenAll(tasks).Result.Where(t => t is not null).FirstOrDefault();
 
         if (lyrics is not null)
         {
