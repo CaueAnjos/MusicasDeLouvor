@@ -66,28 +66,26 @@ internal class PresentationCompiler
     {
         try
         {
-            using (PresentationDocument presentationDocument = PresentationDocument.Create(filepath, PresentationDocumentType.Presentation))
+            using PresentationDocument presentationDocument = PresentationDocument.Create(filepath, PresentationDocumentType.Presentation);
+            // Add presentation part
+            PresentationPart presentationPart = presentationDocument.AddPresentationPart();
+            presentationPart.Presentation = new P.Presentation();
+
+            // Create slide master part
+            CreateSlideMaster(presentationPart);
+
+            // Create slides for the music
+            CreateSlidesForMusic(presentationPart, music);
+
+            // Set slide size (16:9 widescreen)
+            presentationPart.Presentation.SlideSize = new P.SlideSize()
             {
-                // Add presentation part
-                PresentationPart presentationPart = presentationDocument.AddPresentationPart();
-                presentationPart.Presentation = new P.Presentation();
+                Cx = 12192000, // 16:9 width
+                Cy = 6858000,  // 16:9 height
+                Type = P.SlideSizeValues.Screen16x9
+            };
 
-                // Create slide master part
-                CreateSlideMaster(presentationPart);
-
-                // Create slides for the music
-                CreateSlidesForMusic(presentationPart, music);
-
-                // Set slide size (16:9 widescreen)
-                presentationPart.Presentation.SlideSize = new P.SlideSize()
-                {
-                    Cx = 12192000, // 16:9 width
-                    Cy = 6858000,  // 16:9 height
-                    Type = P.SlideSizeValues.Screen16x9
-                };
-
-                presentationPart.Presentation.Save();
-            }
+            presentationPart.Presentation.Save();
         }
         catch (Exception ex)
         {
