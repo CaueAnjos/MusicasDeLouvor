@@ -9,7 +9,7 @@ internal class FileManager
     public async Task Save(Music music)
     {
         string formattedTitle = music.Titulo.ToUpper().Replace(' ', '_').Trim();
-        string formattedArtist = music.Titulo.ToUpper().Replace(' ', '_').Trim();
+        string formattedArtist = music.Artista.ToUpper().Replace(' ', '_').Trim();
         string filePath = System.IO.Path.Combine(Path, $"{formattedTitle}-{formattedArtist}.json");
 
         JsonSerializerOptions options = new();
