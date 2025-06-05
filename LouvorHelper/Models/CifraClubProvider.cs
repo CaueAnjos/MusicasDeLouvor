@@ -19,9 +19,12 @@ internal class CifraClubProvider : IProvider
 
             string rawLyrics = match.Groups[1].Value;
 
-            rawLyrics = Regex.Replace(rawLyrics, @"<b>(.*)</b>", "");
+            rawLyrics = Regex.Replace(rawLyrics, @"<.*>", "");
+            rawLyrics = Regex.Replace(rawLyrics, @"[A-Z].*\|", "");
+            rawLyrics = Regex.Replace(rawLyrics, @"Parte [0-9]* de [0-9]*", "");
             rawLyrics = Regex.Replace(rawLyrics, @"[\[\(](.*)[\]\)]", "");
-            rawLyrics = Regex.Replace(rawLyrics, @"\n{2,}", "\n\n"); // Múltiplas quebras → 2 quebras
+            rawLyrics = Regex.Replace(rawLyrics, @"[ -]{2,}", "");
+            rawLyrics = Regex.Replace(rawLyrics, @"[\n ]{2,}", "\n\n"); // Múltiplas quebras → 2 quebras
 
             string cleanLyrics = rawLyrics.Trim();
             return cleanLyrics;
