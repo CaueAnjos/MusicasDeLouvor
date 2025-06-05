@@ -30,6 +30,7 @@ class Program
     {
         Notify.Info($"Buscando letra para: {titulo} {"de " + autor}");
 
+        // TODO: Adicionar mais provedores: Letras.Mus.br
         List<IProvider> providers =
         [
             new VagalumeProvider(),
@@ -42,7 +43,7 @@ class Program
             providers[1].GetLyrics(titulo, autor)
         ];
 
-        string? lyrics = Task.WhenAll(tasks).Result.Where(t => t is not null).FirstOrDefault();
+        string? lyrics = (await Task.WhenAll(tasks)).FirstOrDefault(t => t is not null);
 
         if (lyrics is not null)
         {
