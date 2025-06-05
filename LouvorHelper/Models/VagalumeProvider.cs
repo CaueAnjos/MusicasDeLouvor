@@ -10,7 +10,6 @@ internal class VagalumeProvider : IProvider
         HttpClient client = new();
         try
         {
-
             string url = $"https://www.vagalume.com.br/{PrepareString(artist)}/{PrepareString(title)}.html";
             string text = await client.GetStringAsync(url);
 
