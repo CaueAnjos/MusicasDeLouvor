@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using louvorHelper.Models;
+using LouvorHelper.Models;
 
 namespace LouvorHelper;
 
@@ -16,7 +16,7 @@ class Program
         getCommand.AddOption(tituloOption);
         getCommand.AddOption(autorOption);
 
-        getCommand.SetHandler(async (string titulo, string? autor) =>
+        getCommand.SetHandler(async (string titulo, string autor) =>
         {
             await GetCommand_Handler(titulo, autor);
         }, tituloOption, autorOption);
@@ -40,7 +40,7 @@ class Program
             FileManager fileManager = new();
             await fileManager.Save(music);
 
-            Notify.Success($"Arquivo salvo em: {fileManager.path}");
+            Notify.Success($"Arquivo salvo em: {fileManager.Path}");
         }
     }
 }

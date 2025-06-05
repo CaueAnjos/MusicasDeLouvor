@@ -1,4 +1,4 @@
-namespace louvorHelper.Models;
+namespace LouvorHelper.Models;
 
 internal interface IProvider
 {
