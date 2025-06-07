@@ -10,29 +10,30 @@ namespace LouvorHelper.Models;
 
 internal class PresentationCompiler
 {
-    public List<Music> Musics { get; private set; }
+    public Queue<Music> Musics { get; private set; }
     public FileManager FileManager { get; private set; }
 
     public PresentationCompiler(IEnumerable<Music> musics, FileManager? fileManager = null)
     {
-        Musics = new List<Music>(musics);
+        Musics = new Queue<Music>(musics);
         FileManager = fileManager is null ? new FileManager() : fileManager;
     }
 
     public PresentationCompiler(FileManager? fileManager = null)
     {
-        Musics = new List<Music>();
+        Musics = new Queue<Music>();
         FileManager = fileManager is null ? new FileManager() : fileManager;
     }
 
     public void AddMusicToCompiler(Music music)
     {
-        Musics.Add(music);
+        Musics.Enqueue(music);
     }
 
     public void AddMusicToCompiler(IEnumerable<Music> musics)
     {
-        Musics.AddRange(musics);
+        foreach (Music music in musics)
+            Musics.Enqueue(music);
     }
 
     public async Task CompileAllAsync()
@@ -47,7 +48,7 @@ internal class PresentationCompiler
         {
             Notify.Info($"Compilando {music.Title} - {music.Artist}");
 
-            Musics.Add(music);
+            Musics.Enqueue(music);
             try
             {
                 string fileName = SanitizeFileName(
