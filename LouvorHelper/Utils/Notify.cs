@@ -1,6 +1,6 @@
 using Dumpify;
 
-namespace LouvorHelper.Models;
+namespace LouvorHelper.Utils;
 
 static class Notify
 {
