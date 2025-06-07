@@ -7,7 +7,7 @@ internal class FileManager
 {
     public FileManager()
     {
-        DownloadPath = Path.GetFullPath("../Musicas");
+        DownloadPath = Path.GetFullPath("../Musics");
         CompileOutputPath = Path.GetFullPath("../Presentations");
 
         _jsonOptions = new JsonSerializerOptions();
