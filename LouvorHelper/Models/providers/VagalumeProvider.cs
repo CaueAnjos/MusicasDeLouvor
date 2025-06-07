@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using LouvorHelper.Utils;
 
-namespace LouvorHelper.Models;
+namespace LouvorHelper.Models.Providers;
 
 internal class VagalumeProvider : IProvider
 {
@@ -10,10 +10,15 @@ internal class VagalumeProvider : IProvider
         HttpClient client = new();
         try
         {
-            string url = $"https://www.vagalume.com.br/{PrepareString(artist)}/{PrepareString(title)}.html";
+            string url =
+                $"https://www.vagalume.com.br/{PrepareString(artist)}/{PrepareString(title)}.html";
             string text = await client.GetStringAsync(url);
 
-            var match = Regex.Match(text, @"<div id=lyrics[^>]*>(.*?)</div>", RegexOptions.Singleline);
+            var match = Regex.Match(
+                text,
+                @"<div id=lyrics[^>]*>(.*?)</div>",
+                RegexOptions.Singleline
+            );
             if (!match.Success)
                 return null;
 

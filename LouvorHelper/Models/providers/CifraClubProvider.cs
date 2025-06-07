@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using LouvorHelper.Utils;
 
-namespace LouvorHelper.Models;
+namespace LouvorHelper.Models.Providers;
 
 internal class CifraClubProvider : IProvider
 {
@@ -10,7 +10,8 @@ internal class CifraClubProvider : IProvider
         HttpClient client = new();
         try
         {
-            string url = $"https://www.cifraclub.com.br/{PrepareString(artist)}/{PrepareString(title)}/";
+            string url =
+                $"https://www.cifraclub.com.br/{PrepareString(artist)}/{PrepareString(title)}/";
             string text = await client.GetStringAsync(url);
 
             var match = Regex.Match(text, @"<pre>(.*?)</pre>", RegexOptions.Singleline);
