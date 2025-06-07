@@ -48,16 +48,23 @@ internal class PresentationCompiler
             Notify.Info($"Compilando {music.Title} - {music.Artist}");
 
             Musics.Add(music);
-            string fileName = SanitizeFileName(
-                $"{music.Title.ToUpper()}-{music.Artist.ToUpper()}.pptx"
-            );
-            string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
-            tasks.Add(
-                Task.Run(() =>
-                {
-                    CreatePresentationForMusic(music, filePath);
-                })
-            );
+            try
+            {
+                string fileName = SanitizeFileName(
+                    $"{music.Title.ToUpper()}-{music.Artist.ToUpper()}.pptx"
+                );
+                string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
+                tasks.Add(
+                    Task.Run(() =>
+                    {
+                        CreatePresentationForMusic(music, filePath);
+                    })
+                );
+            }
+            catch (NullReferenceException)
+            {
+                Notify.Error($"Erro: json não foi formatado corratamente");
+            }
         }
         await Task.WhenAll(tasks);
 
@@ -424,6 +431,8 @@ internal class PresentationCompiler
             "_",
             fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)
         );
+        Console.WriteLine(fileName);
+        Console.WriteLine(sanitized);
         return sanitized.Length > 100 ? sanitized.Substring(0, 100) + ".pptx" : sanitized;
     }
 }
