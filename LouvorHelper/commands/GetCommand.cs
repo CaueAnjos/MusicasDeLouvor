@@ -48,7 +48,7 @@ internal class GetCommand : Command
             FileManager fileManager = new();
             await fileManager.SaveAsync(music);
 
-            Notify.Success($"Arquivo salvo em: {fileManager.Path}");
+            Notify.Success($"Arquivo salvo em: {fileManager.DownloadPath}");
         }
         else
             Notify.Error("Letra não encontrada");

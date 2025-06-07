@@ -5,39 +5,42 @@ namespace LouvorHelper.Models;
 
 internal class FileManager
 {
-    public string Path { get; set; } = System.IO.Path.GetFullPath("../Musicas");
-    public string CompileOutputPath { get; set; } = System.IO.Path.GetFullPath("../Presentations");
+    public FileManager()
+    {
+        DownloadPath = Path.GetFullPath("../Musicas");
+        CompileOutputPath = Path.GetFullPath("../Presentations");
+
+        _jsonOptions = new JsonSerializerOptions();
+        _jsonOptions.WriteIndented = true;
+        _jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper;
+    }
+
+    public string DownloadPath { get; set; }
+    public string CompileOutputPath { get; set; }
+    private JsonSerializerOptions _jsonOptions;
 
     public async Task SaveAsync(Music music)
     {
         // FIXME: use a better way to format the title!
         string formattedTitle = music.Title.ToUpper().Replace(' ', '_').Trim();
         string formattedArtist = music.Artist.ToUpper().Replace(' ', '_').Trim();
-        string filePath = System.IO.Path.Combine(Path, $"{formattedTitle}-{formattedArtist}.json");
 
-        JsonSerializerOptions options = new();
-        options.WriteIndented = true;
-        options.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper;
+        string json = JsonSerializer.Serialize(music, _jsonOptions);
 
-        string json = JsonSerializer.Serialize(music, options);
-
-        Directory.CreateDirectory(Path);
+        Directory.CreateDirectory(DownloadPath);
         await File.WriteAllTextAsync(filePath, json);
     }
 
     public async IAsyncEnumerable<Music> LoadAsync()
     {
-        if (!Directory.Exists(Path))
+        if (!Directory.Exists(DownloadPath))
             yield break;
 
-        foreach (string fileName in Directory.EnumerateFiles(Path))
+        foreach (string fileName in Directory.EnumerateFiles(DownloadPath))
         {
             string json = await File.ReadAllTextAsync(fileName, Encoding.UTF8);
 
-            JsonSerializerOptions options = new();
-            options.WriteIndented = true;
-            options.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper;
-            Music? music = JsonSerializer.Deserialize<Music>(json, options);
+            Music? music = JsonSerializer.Deserialize<Music>(json, _jsonOptions);
 
             if (music is not null)
                 yield return music;
