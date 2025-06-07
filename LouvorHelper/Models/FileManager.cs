@@ -21,9 +21,9 @@ internal class FileManager
 
     public async Task SaveAsync(Music music)
     {
-        // FIXME: use a better way to format the title!
         string formattedTitle = music.Title.ToUpper().Replace(' ', '_').Trim();
-        string formattedArtist = music.Artist.ToUpper().Replace(' ', '_').Trim();
+        string formattedArtist = music.Artist.ToLower().Replace(' ', '_').Trim();
+        string filePath = Path.Combine(DownloadPath, $"{formattedTitle}-{formattedArtist}.json");
 
         string json = JsonSerializer.Serialize(music, _jsonOptions);
 
