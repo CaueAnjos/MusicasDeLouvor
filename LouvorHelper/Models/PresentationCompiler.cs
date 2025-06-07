@@ -45,11 +45,11 @@ internal class PresentationCompiler
         List<Task> tasks = new();
         await foreach (Music music in FileManager.LoadAsync())
         {
-            Notify.Info($"Compilando {music.Titulo} - {music.Artista}");
+            Notify.Info($"Compilando {music.Title} - {music.Artist}");
 
             Musics.Add(music);
             string fileName = SanitizeFileName(
-                $"{music.Titulo.ToUpper()}-{music.Artista.ToUpper()}.pptx"
+                $"{music.Title.ToUpper()}-{music.Artist.ToUpper()}.pptx"
             );
             string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
             tasks.Add(
@@ -99,7 +99,7 @@ internal class PresentationCompiler
         }
         catch (Exception ex)
         {
-            Notify.Error($"Erro ao criar apresentação para {music.Titulo}: {ex.Message}");
+            Notify.Error($"Erro ao criar apresentação para {music.Title}: {ex.Message}");
             throw;
         }
     }
@@ -168,7 +168,7 @@ internal class PresentationCompiler
 
         // Title slide
         SlidePart titleSlidePart = presentationPart.AddNewPart<SlidePart>($"rId{relationshipId}");
-        titleSlidePart.Slide = CreateTitleSlide(music.Titulo, music.Artista);
+        titleSlidePart.Slide = CreateTitleSlide(music.Title, music.Artist);
         titleSlidePart.Slide.Save();
 
         slideIdList.Append(
@@ -180,9 +180,9 @@ internal class PresentationCompiler
         );
 
         // Lyrics slides - split lyrics into verses/choruses
-        if (!string.IsNullOrEmpty(music.Letra))
+        if (!string.IsNullOrEmpty(music.Lyrics))
         {
-            var lyricSections = SplitLyrics(music.Letra);
+            var lyricSections = SplitLyrics(music.Lyrics);
             foreach (var section in lyricSections)
             {
                 SlidePart lyricSlidePart = presentationPart.AddNewPart<SlidePart>(

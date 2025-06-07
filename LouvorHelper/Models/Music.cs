@@ -2,15 +2,14 @@ namespace LouvorHelper.Models;
 
 class Music
 {
-    public Music(string titulo, string artista, string letra)
+    public Music(string title, string artist, string lyrics)
     {
-        Titulo = titulo;
-        Artista = artista;
-        Letra = letra;
+        Title = title;
+        Artist = artist;
+        Lyrics = lyrics;
     }
 
-    // TODO: use english names
-    public string Titulo { get; set; }
-    public string Artista { get; set; }
-    public string Letra { get; set; }
+    public string Title { get; set; }
+    public string Artist { get; set; }
+    public string Lyrics { get; set; }
 }
