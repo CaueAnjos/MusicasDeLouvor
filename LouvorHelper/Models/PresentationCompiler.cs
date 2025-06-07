@@ -1,8 +1,8 @@
-using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml;
-using P = DocumentFormat.OpenXml.Presentation;
+using DocumentFormat.OpenXml.Packaging;
 using LouvorHelper.Utils;
 using D = DocumentFormat.OpenXml.Drawing;
+using P = DocumentFormat.OpenXml.Presentation;
 
 namespace LouvorHelper.Models;
 
@@ -48,16 +48,22 @@ internal class PresentationCompiler
             Notify.Info($"Compilando {music.Titulo} - {music.Artista}");
 
             Musics.Add(music);
-            string fileName = SanitizeFileName($"{music.Titulo.ToUpper()}-{music.Artista.ToUpper()}.pptx");
+            string fileName = SanitizeFileName(
+                $"{music.Titulo.ToUpper()}-{music.Artista.ToUpper()}.pptx"
+            );
             string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
-            tasks.Add(Task.Run(() =>
-            {
-                CreatePresentationForMusic(music, filePath);
-            }));
+            tasks.Add(
+                Task.Run(() =>
+                {
+                    CreatePresentationForMusic(music, filePath);
+                })
+            );
         }
         await Task.WhenAll(tasks);
 
-        Notify.Success($"Compilação concluída! {Musics.Count} apresentações criadas em '{FileManager.CompileOutputPath}'");
+        Notify.Success(
+            $"Compilação concluída! {Musics.Count} apresentações criadas em '{FileManager.CompileOutputPath}'"
+        );
     }
 
     /// <summary>
@@ -67,7 +73,10 @@ internal class PresentationCompiler
     {
         try
         {
-            using PresentationDocument presentationDocument = PresentationDocument.Create(filepath, PresentationDocumentType.Presentation);
+            using PresentationDocument presentationDocument = PresentationDocument.Create(
+                filepath,
+                PresentationDocumentType.Presentation
+            );
             // Add presentation part
             PresentationPart presentationPart = presentationDocument.AddPresentationPart();
             presentationPart.Presentation = new P.Presentation();
@@ -82,8 +91,8 @@ internal class PresentationCompiler
             presentationPart.Presentation.SlideSize = new P.SlideSize()
             {
                 Cx = 12192000, // 16:9 width
-                Cy = 6858000,  // 16:9 height
-                Type = P.SlideSizeValues.Screen16x9
+                Cy = 6858000, // 16:9 height
+                Type = P.SlideSizeValues.Screen16x9,
             };
 
             presentationPart.Presentation.Save();
@@ -100,13 +109,16 @@ internal class PresentationCompiler
         // Create slide master part
         SlideMasterPart slideMasterPart = presentationPart.AddNewPart<SlideMasterPart>("rId1");
         slideMasterPart.SlideMaster = new P.SlideMaster(
-            new P.CommonSlideData(new P.ShapeTree(
-                new P.NonVisualGroupShapeProperties(
-                    new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                    new P.NonVisualGroupShapeDrawingProperties(),
-                    new P.ApplicationNonVisualDrawingProperties()),
-                new P.GroupShapeProperties(new D.TransformGroup())
-            )),
+            new P.CommonSlideData(
+                new P.ShapeTree(
+                    new P.NonVisualGroupShapeProperties(
+                        new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
+                        new P.NonVisualGroupShapeDrawingProperties(),
+                        new P.ApplicationNonVisualDrawingProperties()
+                    ),
+                    new P.GroupShapeProperties(new D.TransformGroup())
+                )
+            ),
             new P.ColorMap()
             {
                 Background1 = D.ColorSchemeIndexValues.Light1,
@@ -120,20 +132,23 @@ internal class PresentationCompiler
                 Accent5 = D.ColorSchemeIndexValues.Accent5,
                 Accent6 = D.ColorSchemeIndexValues.Accent6,
                 Hyperlink = D.ColorSchemeIndexValues.Hyperlink,
-                FollowedHyperlink = D.ColorSchemeIndexValues.FollowedHyperlink
+                FollowedHyperlink = D.ColorSchemeIndexValues.FollowedHyperlink,
             }
         );
 
         // Create slide layout
         SlideLayoutPart slideLayoutPart = slideMasterPart.AddNewPart<SlideLayoutPart>("rId1");
         slideLayoutPart.SlideLayout = new P.SlideLayout(
-            new P.CommonSlideData(new P.ShapeTree(
-                new P.NonVisualGroupShapeProperties(
-                    new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                    new P.NonVisualGroupShapeDrawingProperties(),
-                    new P.ApplicationNonVisualDrawingProperties()),
-                new P.GroupShapeProperties(new D.TransformGroup())
-            )),
+            new P.CommonSlideData(
+                new P.ShapeTree(
+                    new P.NonVisualGroupShapeProperties(
+                        new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
+                        new P.NonVisualGroupShapeDrawingProperties(),
+                        new P.ApplicationNonVisualDrawingProperties()
+                    ),
+                    new P.GroupShapeProperties(new D.TransformGroup())
+                )
+            ),
             new P.ColorMapOverride(new D.MasterColorMapping())
         );
 
@@ -156,11 +171,13 @@ internal class PresentationCompiler
         titleSlidePart.Slide = CreateTitleSlide(music.Titulo, music.Artista);
         titleSlidePart.Slide.Save();
 
-        slideIdList.Append(new P.SlideId()
-        {
-            Id = (UInt32Value)slideId++,
-            RelationshipId = $"rId{relationshipId++}"
-        });
+        slideIdList.Append(
+            new P.SlideId()
+            {
+                Id = (UInt32Value)slideId++,
+                RelationshipId = $"rId{relationshipId++}",
+            }
+        );
 
         // Lyrics slides - split lyrics into verses/choruses
         if (!string.IsNullOrEmpty(music.Letra))
@@ -168,15 +185,19 @@ internal class PresentationCompiler
             var lyricSections = SplitLyrics(music.Letra);
             foreach (var section in lyricSections)
             {
-                SlidePart lyricSlidePart = presentationPart.AddNewPart<SlidePart>($"rId{relationshipId}");
+                SlidePart lyricSlidePart = presentationPart.AddNewPart<SlidePart>(
+                    $"rId{relationshipId}"
+                );
                 lyricSlidePart.Slide = CreateLyricSlide(section);
                 lyricSlidePart.Slide.Save();
 
-                slideIdList.Append(new P.SlideId()
-                {
-                    Id = (UInt32Value)slideId++,
-                    RelationshipId = $"rId{relationshipId++}"
-                });
+                slideIdList.Append(
+                    new P.SlideId()
+                    {
+                        Id = (UInt32Value)slideId++,
+                        RelationshipId = $"rId{relationshipId++}",
+                    }
+                );
             }
         }
 
@@ -195,13 +216,16 @@ internal class PresentationCompiler
                         new P.ApplicationNonVisualDrawingProperties()
                     ),
                     new P.GroupShapeProperties(new D.TransformGroup()),
-
                     // Title
                     new P.Shape(
                         new P.NonVisualShapeProperties(
                             new P.NonVisualDrawingProperties() { Id = 2, Name = "Title" },
-                            new P.NonVisualShapeDrawingProperties(new D.ShapeLocks() { NoGrouping = true }),
-                            new P.ApplicationNonVisualDrawingProperties(new P.PlaceholderShape() { Type = P.PlaceholderValues.Title })
+                            new P.NonVisualShapeDrawingProperties(
+                                new D.ShapeLocks() { NoGrouping = true }
+                            ),
+                            new P.ApplicationNonVisualDrawingProperties(
+                                new P.PlaceholderShape() { Type = P.PlaceholderValues.Title }
+                            )
                         ),
                         new P.ShapeProperties(
                             new D.Transform2D(
@@ -213,7 +237,10 @@ internal class PresentationCompiler
                             new D.BodyProperties() { Anchor = D.TextAnchoringTypeValues.Center },
                             new D.ListStyle(),
                             new D.Paragraph(
-                                new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
+                                new D.ParagraphProperties()
+                                {
+                                    Alignment = D.TextAlignmentTypeValues.Center,
+                                },
                                 new D.Run(
                                     new D.RunProperties() { FontSize = 4400, Bold = true },
                                     new D.Text(title)
@@ -221,12 +248,13 @@ internal class PresentationCompiler
                             )
                         )
                     ),
-
                     // Artist subtitle
                     new P.Shape(
                         new P.NonVisualShapeProperties(
                             new P.NonVisualDrawingProperties() { Id = 3, Name = "Subtitle" },
-                            new P.NonVisualShapeDrawingProperties(new D.ShapeLocks() { NoGrouping = true }),
+                            new P.NonVisualShapeDrawingProperties(
+                                new D.ShapeLocks() { NoGrouping = true }
+                            ),
                             new P.ApplicationNonVisualDrawingProperties()
                         ),
                         new P.ShapeProperties(
@@ -239,7 +267,10 @@ internal class PresentationCompiler
                             new D.BodyProperties() { Anchor = D.TextAnchoringTypeValues.Center },
                             new D.ListStyle(),
                             new D.Paragraph(
-                                new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
+                                new D.ParagraphProperties()
+                                {
+                                    Alignment = D.TextAlignmentTypeValues.Center,
+                                },
                                 new D.Run(
                                     new D.RunProperties() { FontSize = 2800 },
                                     new D.Text($"Por: {artist}")
@@ -264,12 +295,13 @@ internal class PresentationCompiler
                         new P.ApplicationNonVisualDrawingProperties()
                     ),
                     new P.GroupShapeProperties(new D.TransformGroup()),
-
                     // Lyrics text box
                     new P.Shape(
                         new P.NonVisualShapeProperties(
                             new P.NonVisualDrawingProperties() { Id = 2, Name = "Lyrics" },
-                            new P.NonVisualShapeDrawingProperties(new D.ShapeLocks() { NoGrouping = true }),
+                            new P.NonVisualShapeDrawingProperties(
+                                new D.ShapeLocks() { NoGrouping = true }
+                            ),
                             new P.ApplicationNonVisualDrawingProperties()
                         ),
                         new P.ShapeProperties(
@@ -292,7 +324,7 @@ internal class PresentationCompiler
             new D.BodyProperties()
             {
                 Anchor = D.TextAnchoringTypeValues.Center,
-                Wrap = D.TextWrappingValues.Square
+                Wrap = D.TextWrappingValues.Square,
             },
             new D.ListStyle()
         );
@@ -300,13 +332,12 @@ internal class PresentationCompiler
         var lines = lyrics.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         foreach (var line in lines)
         {
-            textBody.Append(new D.Paragraph(
-                new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
-                new D.Run(
-                    new D.RunProperties() { FontSize = 3200 },
-                    new D.Text(line.Trim())
+            textBody.Append(
+                new D.Paragraph(
+                    new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
+                    new D.Run(new D.RunProperties() { FontSize = 3200 }, new D.Text(line.Trim()))
                 )
-            ));
+            );
         }
 
         // Se não há linhas, adiciona um parágrafo vazio
@@ -325,18 +356,17 @@ internal class PresentationCompiler
 
         foreach (var line in lines)
         {
-            paragraphs.Add(new D.Paragraph(
-                new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
-                new D.Run(
-                    new D.RunProperties() { FontSize = 3200 },
-                    new D.Text(line.Trim())
+            paragraphs.Add(
+                new D.Paragraph(
+                    new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
+                    new D.Run(new D.RunProperties() { FontSize = 3200 }, new D.Text(line.Trim()))
                 )
-            ));
+            );
         }
 
-        return paragraphs.Count > 0 ? paragraphs.ToArray() : new[] {
-            new D.Paragraph(new D.Run(new D.Text("")))
-        };
+        return paragraphs.Count > 0
+            ? paragraphs.ToArray()
+            : new[] { new D.Paragraph(new D.Run(new D.Text(""))) };
     }
 
     /// <summary>
@@ -390,7 +420,10 @@ internal class PresentationCompiler
     private string SanitizeFileName(string fileName)
     {
         var invalidChars = Path.GetInvalidFileNameChars();
-        var sanitized = string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
+        var sanitized = string.Join(
+            "_",
+            fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)
+        );
         return sanitized.Length > 100 ? sanitized.Substring(0, 100) + ".pptx" : sanitized;
     }
 }
