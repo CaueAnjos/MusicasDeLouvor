@@ -1,4 +1,4 @@
-namespace LouvorHelper;
+namespace LouvorHelper.Models;
 
 class Music
 {
