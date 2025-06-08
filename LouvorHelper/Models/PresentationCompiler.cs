@@ -51,9 +51,9 @@ internal class PresentationCompiler
             Musics.Enqueue(music);
             try
             {
-                string fileName = SanitizeFileName(
-                    $"{music.Title.ToUpper()}-{music.Artist.ToUpper()}.pptx"
-                );
+                string titleFormatted = music.Title.ToUpper().Trim().Replace(' ', '_');
+                string artistFormatted = music.Artist.ToLower().Trim().Replace(' ', '_');
+                string fileName = SanitizeFileName($"{titleFormatted}-{artistFormatted}.pptx");
                 string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
                 tasks.Add(
                     Task.Run(() =>
