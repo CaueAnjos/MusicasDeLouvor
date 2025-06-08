@@ -59,6 +59,7 @@ internal class PresentationCompiler
                     Task.Run(() =>
                     {
                         CreatePresentationForMusic(music, filePath);
+                        Notify.Success($"Compilado com sucesso: {fileName}");
                     })
                 );
             }
@@ -432,8 +433,6 @@ internal class PresentationCompiler
             "_",
             fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)
         );
-        Console.WriteLine(fileName);
-        Console.WriteLine(sanitized);
         return sanitized.Length > 100 ? sanitized.Substring(0, 100) + ".pptx" : sanitized;
     }
 }
