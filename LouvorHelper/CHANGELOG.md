@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.0.1"></a>
+## [1.0.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.0.1) (2025-06-08)
+
+### Bug Fixes
+
+* **PresentationCompiler:** add diferente case for `title` and `artist` also replace space for _ ([2eb11bb](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/2eb11bbf9222c80d130c5dd9883a620fa35201c6))
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.0.0) (2025-06-08)
 
