@@ -6,60 +6,222 @@ using P = DocumentFormat.OpenXml.Presentation;
 
 namespace LouvorHelper.Models.Presentation;
 
-class PresentationDocument
+/// <summary>
+/// Main presentation document class - handles creating PowerPoint presentations from music data
+/// </summary>
+internal class PresentationDocument
 {
-    private Music _music;
+    private readonly Music _music;
+    private readonly List<Slide> _slides;
+    private string? _templatePath;
 
     public PresentationDocument(Music music)
     {
         _music = music;
+        _slides = new List<Slide>();
+        GenerateSlidesFromMusic();
     }
 
-    public void Save(string filepath)
+    /// <summary>
+    /// Sets the PowerPoint template to use for the presentation
+    /// </summary>
+    /// <param name="templatePath">Path to the PowerPoint template file</param>
+    /// <returns>This PresentationDocument instance for method chaining</returns>
+    public PresentationDocument SetTemplate(string templatePath)
     {
-        CreatePresentationForMusic(_music, filepath);
+        if (!TemplateManager.IsValidTemplate(templatePath))
+        {
+            throw new ArgumentException($"Invalid template file: {templatePath}");
+        }
+
+        _templatePath = templatePath;
+        return this;
     }
 
-    private void CreatePresentationForMusic(Music music, string filepath)
+    /// <summary>
+    /// Adds a slide to the presentation
+    /// </summary>
+    /// <param name="slide">The slide to add</param>
+    public void AddSlide(Slide slide)
+    {
+        _slides.Add(slide);
+    }
+
+    /// <summary>
+    /// Inserts a slide at the specified position
+    /// </summary>
+    /// <param name="index">The position to insert the slide</param>
+    /// <param name="slide">The slide to insert</param>
+    public void InsertSlide(int index, Slide slide)
+    {
+        if (index < 0 || index > _slides.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        _slides.Insert(index, slide);
+    }
+
+    /// <summary>
+    /// Removes a slide at the specified position
+    /// </summary>
+    /// <param name="index">The position of the slide to remove</param>
+    public void RemoveSlide(int index)
+    {
+        if (index >= 0 && index < _slides.Count)
+        {
+            _slides.RemoveAt(index);
+        }
+    }
+
+    /// <summary>
+    /// Gets the current slides in the presentation
+    /// </summary>
+    public IReadOnlyList<Slide> Slides => _slides.AsReadOnly();
+
+    /// <summary>
+    /// Saves the presentation to the specified file path
+    /// </summary>
+    /// <param name="filepath">The path where the presentation will be saved</param>
+    public void Save(string filepath)
     {
         try
         {
-            using DocumentFormat.OpenXml.Packaging.PresentationDocument presentationDocument =
-                DocumentFormat.OpenXml.Packaging.PresentationDocument.Create(
-                    filepath,
-                    PresentationDocumentType.Presentation
-                );
-            // Add presentation part
-            PresentationPart presentationPart = presentationDocument.AddPresentationPart();
-            presentationPart.Presentation = new P.Presentation();
-
-            // Create slide master part
-            CreateSlideMaster(presentationPart);
-
-            // Create slides for the music
-            CreateSlidesForMusic(presentationPart, music);
-
-            // Set slide size (16:9 widescreen)
-            presentationPart.Presentation.SlideSize = new P.SlideSize()
+            if (!string.IsNullOrEmpty(_templatePath))
             {
-                Cx = 12192000, // 16:9 width
-                Cy = 6858000, // 16:9 height
-                Type = P.SlideSizeValues.Screen16x9,
-            };
-
-            presentationPart.Presentation.Save();
+                CreatePresentationFromTemplate(filepath);
+            }
+            else
+            {
+                CreatePresentationFromScratch(filepath);
+            }
         }
         catch (Exception ex)
         {
-            Notify.Error($"Erro ao criar apresentação para {music.Title}: {ex.Message}");
+            Notify.Error($"Erro ao criar apresentação para {_music.Title}: {ex.Message}");
             throw;
         }
     }
 
-    private void CreateSlideMaster(PresentationPart presentationPart)
+    private void GenerateSlidesFromMusic()
     {
-        // Create slide master part
-        SlideMasterPart slideMasterPart = presentationPart.AddNewPart<SlideMasterPart>("rId1");
+        // Add title slide
+        _slides.Add(Slide.CreateTitleSlide(_music.Title, _music.Artist));
+
+        // Add lyrics slides
+        if (!string.IsNullOrEmpty(_music.Lyrics))
+        {
+            var lyricSections = LyricsSplitter.SplitLyrics(_music.Lyrics);
+            foreach (var section in lyricSections)
+            {
+                _slides.Add(Slide.CreateLyricsSlide(section));
+            }
+        }
+    }
+
+    private void CreatePresentationFromTemplate(string filepath)
+    {
+        using var presentationDoc = TemplateManager.CreateFromTemplate(_templatePath!, filepath);
+        var presentationPart = presentationDoc.PresentationPart!;
+
+        // Clear existing slides but keep master
+        ClearExistingSlides(presentationPart);
+
+        // Add our slides
+        AddSlidesToPresentation(presentationPart);
+
+        presentationPart.Presentation.Save();
+    }
+
+    private void CreatePresentationFromScratch(string filepath)
+    {
+        using var presentationDoc = DocumentFormat.OpenXml.Packaging.PresentationDocument.Create(
+            filepath,
+            PresentationDocumentType.Presentation
+        );
+
+        var presentationPart = presentationDoc.AddPresentationPart();
+        presentationPart.Presentation = new P.Presentation();
+
+        // Create slide master and layouts
+        var slideMasterPart = CreateSlideMaster(presentationPart);
+        var layoutManager = new SlideLayoutManager(presentationPart);
+        layoutManager.CreateDefaultLayouts(slideMasterPart);
+
+        // Add slides
+        AddSlidesToPresentation(presentationPart);
+
+        // Set slide size (16:9 widescreen)
+        presentationPart.Presentation.SlideSize = new P.SlideSize()
+        {
+            Cx = 12192000, // 16:9 width
+            Cy = 6858000, // 16:9 height
+            Type = P.SlideSizeValues.Screen16x9,
+        };
+
+        presentationPart.Presentation.Save();
+    }
+
+    private void AddSlidesToPresentation(PresentationPart presentationPart)
+    {
+        var slideIdList = new P.SlideIdList();
+        uint slideId = 256;
+        int relationshipId = GetNextRelationshipId(presentationPart);
+
+        foreach (var slide in _slides)
+        {
+            var slidePart = presentationPart.AddNewPart<SlidePart>($"rId{relationshipId}");
+            slidePart.Slide = SlideFactory.CreateSlide(slide);
+            slidePart.Slide.Save();
+
+            slideIdList.Append(
+                new P.SlideId()
+                {
+                    Id = (UInt32Value)slideId++,
+                    RelationshipId = $"rId{relationshipId++}",
+                }
+            );
+        }
+
+        presentationPart.Presentation.SlideIdList = slideIdList;
+    }
+
+    private static void ClearExistingSlides(PresentationPart presentationPart)
+    {
+        // Remove existing slides but keep the structure
+        var slideIdList = presentationPart.Presentation.SlideIdList;
+        if (slideIdList != null)
+        {
+            var slideIds = slideIdList.Elements<P.SlideId>().ToList();
+            foreach (var slideId in slideIds)
+            {
+                var slidePart = (SlidePart)presentationPart.GetPartById(slideId.RelationshipId!);
+                presentationPart.DeletePart(slidePart);
+                slideId.Remove();
+            }
+        }
+    }
+
+    private static int GetNextRelationshipId(PresentationPart presentationPart)
+    {
+        // Find the highest relationship ID and return next available
+        int maxId = 1;
+        foreach (var part in presentationPart.Parts)
+        {
+            if (part.RelationshipId.StartsWith("rId"))
+            {
+                if (int.TryParse(part.RelationshipId.Substring(3), out int id))
+                {
+                    maxId = Math.Max(maxId, id);
+                }
+            }
+        }
+        return maxId + 1;
+    }
+
+    private SlideMasterPart CreateSlideMaster(PresentationPart presentationPart)
+    {
+        var slideMasterPart = presentationPart.AddNewPart<SlideMasterPart>("rId1");
         slideMasterPart.SlideMaster = new P.SlideMaster(
             new P.CommonSlideData(
                 new P.ShapeTree(
@@ -88,281 +250,10 @@ class PresentationDocument
             }
         );
 
-        // Create slide layout
-        SlideLayoutPart slideLayoutPart = slideMasterPart.AddNewPart<SlideLayoutPart>("rId1");
-        slideLayoutPart.SlideLayout = new P.SlideLayout(
-            new P.CommonSlideData(
-                new P.ShapeTree(
-                    new P.NonVisualGroupShapeProperties(
-                        new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                        new P.NonVisualGroupShapeDrawingProperties(),
-                        new P.ApplicationNonVisualDrawingProperties()
-                    ),
-                    new P.GroupShapeProperties(new D.TransformGroup())
-                )
-            ),
-            new P.ColorMapOverride(new D.MasterColorMapping())
-        );
-
-        slideMasterPart.SlideMaster.Save();
-
-        // Add SlideMasterId to presentation
         presentationPart.Presentation.SlideMasterIdList = new P.SlideMasterIdList(
             new P.SlideMasterId() { Id = (UInt32Value)2147483648U, RelationshipId = "rId1" }
         );
-    }
 
-    private void CreateSlidesForMusic(PresentationPart presentationPart, Music music)
-    {
-        var slideIdList = new P.SlideIdList();
-        uint slideId = 256;
-        int relationshipId = 2;
-
-        // Title slide
-        SlidePart titleSlidePart = presentationPart.AddNewPart<SlidePart>($"rId{relationshipId}");
-        titleSlidePart.Slide = CreateTitleSlide(music.Title, music.Artist);
-        titleSlidePart.Slide.Save();
-
-        slideIdList.Append(
-            new P.SlideId()
-            {
-                Id = (UInt32Value)slideId++,
-                RelationshipId = $"rId{relationshipId++}",
-            }
-        );
-
-        // Lyrics slides - split lyrics into verses/choruses
-        if (!string.IsNullOrEmpty(music.Lyrics))
-        {
-            var lyricSections = SplitLyrics(music.Lyrics);
-            foreach (var section in lyricSections)
-            {
-                SlidePart lyricSlidePart = presentationPart.AddNewPart<SlidePart>(
-                    $"rId{relationshipId}"
-                );
-                lyricSlidePart.Slide = CreateLyricSlide(section);
-                lyricSlidePart.Slide.Save();
-
-                slideIdList.Append(
-                    new P.SlideId()
-                    {
-                        Id = (UInt32Value)slideId++,
-                        RelationshipId = $"rId{relationshipId++}",
-                    }
-                );
-            }
-        }
-
-        // Add all slides to presentation
-        presentationPart.Presentation.SlideIdList = slideIdList;
-    }
-
-    private static P.Slide CreateTitleSlide(string title, string artist)
-    {
-        return new P.Slide(
-            new P.CommonSlideData(
-                new P.ShapeTree(
-                    new P.NonVisualGroupShapeProperties(
-                        new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                        new P.NonVisualGroupShapeDrawingProperties(),
-                        new P.ApplicationNonVisualDrawingProperties()
-                    ),
-                    new P.GroupShapeProperties(new D.TransformGroup()),
-                    // Title
-                    new P.Shape(
-                        new P.NonVisualShapeProperties(
-                            new P.NonVisualDrawingProperties() { Id = 2, Name = "Title" },
-                            new P.NonVisualShapeDrawingProperties(
-                                new D.ShapeLocks() { NoGrouping = true }
-                            ),
-                            new P.ApplicationNonVisualDrawingProperties(
-                                new P.PlaceholderShape() { Type = P.PlaceholderValues.Title }
-                            )
-                        ),
-                        new P.ShapeProperties(
-                            new D.Transform2D(
-                                new D.Offset() { X = 914400L, Y = 1828800L },
-                                new D.Extents() { Cx = 10297200L, Cy = 1368296L }
-                            )
-                        ),
-                        new P.TextBody(
-                            new D.BodyProperties() { Anchor = D.TextAnchoringTypeValues.Center },
-                            new D.ListStyle(),
-                            new D.Paragraph(
-                                new D.ParagraphProperties()
-                                {
-                                    Alignment = D.TextAlignmentTypeValues.Center,
-                                },
-                                new D.Run(
-                                    new D.RunProperties() { FontSize = 4400, Bold = true },
-                                    new D.Text(title)
-                                )
-                            )
-                        )
-                    ),
-                    // Artist subtitle
-                    new P.Shape(
-                        new P.NonVisualShapeProperties(
-                            new P.NonVisualDrawingProperties() { Id = 3, Name = "Subtitle" },
-                            new P.NonVisualShapeDrawingProperties(
-                                new D.ShapeLocks() { NoGrouping = true }
-                            ),
-                            new P.ApplicationNonVisualDrawingProperties()
-                        ),
-                        new P.ShapeProperties(
-                            new D.Transform2D(
-                                new D.Offset() { X = 914400L, Y = 3429000L },
-                                new D.Extents() { Cx = 10297200L, Cy = 1000000L }
-                            )
-                        ),
-                        new P.TextBody(
-                            new D.BodyProperties() { Anchor = D.TextAnchoringTypeValues.Center },
-                            new D.ListStyle(),
-                            new D.Paragraph(
-                                new D.ParagraphProperties()
-                                {
-                                    Alignment = D.TextAlignmentTypeValues.Center,
-                                },
-                                new D.Run(
-                                    new D.RunProperties() { FontSize = 2800 },
-                                    new D.Text($"Por: {artist}")
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
-            new P.ColorMapOverride(new D.MasterColorMapping())
-        );
-    }
-
-    private static P.Slide CreateLyricSlide(string lyrics)
-    {
-        return new P.Slide(
-            new P.CommonSlideData(
-                new P.ShapeTree(
-                    new P.NonVisualGroupShapeProperties(
-                        new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                        new P.NonVisualGroupShapeDrawingProperties(),
-                        new P.ApplicationNonVisualDrawingProperties()
-                    ),
-                    new P.GroupShapeProperties(new D.TransformGroup()),
-                    // Lyrics text box
-                    new P.Shape(
-                        new P.NonVisualShapeProperties(
-                            new P.NonVisualDrawingProperties() { Id = 2, Name = "Lyrics" },
-                            new P.NonVisualShapeDrawingProperties(
-                                new D.ShapeLocks() { NoGrouping = true }
-                            ),
-                            new P.ApplicationNonVisualDrawingProperties()
-                        ),
-                        new P.ShapeProperties(
-                            new D.Transform2D(
-                                new D.Offset() { X = 914400L, Y = 1000000L },
-                                new D.Extents() { Cx = 10297200L, Cy = 4858000L }
-                            )
-                        ),
-                        CreateLyricTextBody(lyrics)
-                    )
-                )
-            ),
-            new P.ColorMapOverride(new D.MasterColorMapping())
-        );
-    }
-
-    private static P.TextBody CreateLyricTextBody(string lyrics)
-    {
-        var textBody = new P.TextBody(
-            new D.BodyProperties()
-            {
-                Anchor = D.TextAnchoringTypeValues.Center,
-                Wrap = D.TextWrappingValues.Square,
-            },
-            new D.ListStyle()
-        );
-
-        var lines = lyrics.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
-        {
-            textBody.Append(
-                new D.Paragraph(
-                    new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
-                    new D.Run(new D.RunProperties() { FontSize = 3200 }, new D.Text(line.Trim()))
-                )
-            );
-        }
-
-        // Se não há linhas, adiciona um parágrafo vazio
-        if (lines.Length == 0)
-        {
-            textBody.Append(new D.Paragraph(new D.Run(new D.Text(""))));
-        }
-
-        return textBody;
-    }
-
-    private static D.Paragraph[] CreateLyricParagraphs(string lyrics)
-    {
-        var lines = lyrics.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        var paragraphs = new List<D.Paragraph>();
-
-        foreach (var line in lines)
-        {
-            paragraphs.Add(
-                new D.Paragraph(
-                    new D.ParagraphProperties() { Alignment = D.TextAlignmentTypeValues.Center },
-                    new D.Run(new D.RunProperties() { FontSize = 3200 }, new D.Text(line.Trim()))
-                )
-            );
-        }
-
-        return paragraphs.Count > 0
-            ? paragraphs.ToArray()
-            : new[] { new D.Paragraph(new D.Run(new D.Text(""))) };
-    }
-
-    /// <summary>
-    /// Splits lyrics into manageable sections for slides
-    /// </summary>
-    private List<string> SplitLyrics(string lyrics)
-    {
-        var sections = new List<string>();
-        if (string.IsNullOrWhiteSpace(lyrics))
-            return sections;
-
-        // Split by double line breaks (verse separators) or every 6-8 lines
-        var lines = lyrics.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        var currentSection = new List<string>();
-        foreach (var line in lines)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                // Empty line indicates section break
-                if (currentSection.Count > 0)
-                {
-                    sections.Add(string.Join("\n", currentSection));
-                    currentSection.Clear();
-                }
-            }
-            else
-            {
-                currentSection.Add(line.Trim());
-
-                // If section gets too long, split it
-                if (currentSection.Count >= 8)
-                {
-                    sections.Add(string.Join("\n", currentSection));
-                    currentSection.Clear();
-                }
-            }
-        }
-
-        // Add remaining lines
-        if (currentSection.Count > 0)
-        {
-            sections.Add(string.Join("\n", currentSection));
-        }
-
-        return sections.Count > 0 ? sections : new List<string> { lyrics };
+        return slideMasterPart;
     }
 }
