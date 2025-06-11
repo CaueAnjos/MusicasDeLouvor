@@ -31,6 +31,18 @@ internal class FileManager
         await File.WriteAllTextAsync(filePath, json);
     }
 
+    public async Task<Music?> LoadAsync(string filePath)
+    {
+        if (Path.Exists(filePath))
+        {
+            return JsonSerializer.Deserialize<Music>(
+                await File.ReadAllTextAsync(filePath, Encoding.UTF8),
+                _jsonOptions
+            );
+        }
+        return null;
+    }
+
     public async IAsyncEnumerable<Music> LoadAsync()
     {
         if (!Directory.Exists(DownloadPath))
@@ -38,9 +50,7 @@ internal class FileManager
 
         foreach (string fileName in Directory.EnumerateFiles(DownloadPath))
         {
-            string json = await File.ReadAllTextAsync(fileName, Encoding.UTF8);
-
-            Music? music = JsonSerializer.Deserialize<Music>(json, _jsonOptions);
+            Music? music = await LoadAsync(fileName);
 
             if (music is not null)
                 yield return music;
