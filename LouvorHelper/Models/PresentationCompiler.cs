@@ -7,6 +7,7 @@ internal class PresentationCompiler
 {
     public Queue<Music> Musics { get; private set; }
     public FileManager FileManager { get; private set; }
+    public string TemplatePath { get; set; } = string.Empty;
 
     public PresentationCompiler(IEnumerable<Music> musics, FileManager? fileManager = null)
     {
@@ -54,6 +55,7 @@ internal class PresentationCompiler
                     Task.Run(() =>
                     {
                         PresentationDocument presentation = new(music);
+                        presentation.SetTemplate(TemplatePath);
                         presentation.Save(filePath);
                         Notify.Success($"Compilado com sucesso: {fileName}");
                     })
