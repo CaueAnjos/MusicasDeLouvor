@@ -36,8 +36,7 @@ internal class PresentationCompiler
     {
         Notify.Info("Iniciando compilação...");
 
-        if (!Directory.Exists(FileManager.CompileOutputPath))
-            Directory.CreateDirectory(FileManager.CompileOutputPath);
+        FileManager.ClearCompiled();
 
         List<Task> tasks = new();
         await foreach (Music music in FileManager.LoadAsync())
