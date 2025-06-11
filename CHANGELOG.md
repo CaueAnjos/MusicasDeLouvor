@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.2.0"></a>
+## [1.2.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.2.0) (2025-06-11)
+
+### Features
+
+* **FileManager:** add Clear for clearing folders ([b533e59](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/b533e59674074f1238f801c7a91ec68914e181eb))
+* **FileManager:** add LoadAsync for only one music ([d0cbe8f](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/d0cbe8f6254a890c3e6753a932cc2975f2482dd5))
+* **Medley:** add MedleyCommand ([55a06cf](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/55a06cfd6640b5c7569447ed0fe8d837f17f76d3))
+* **Music/Presentations:** add a medley ([577c4be](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/577c4befc654b2c2ff1da62a37822a7705b1bb6a))
+* **Notify:** add YesNoBox for asking user bool input ([0610a17](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/0610a17a38ffe4e50655cef65ce033eb221bd74c))
+* **PresentationCompiler:** add claer folder for not having unused presentations ([9ece96f](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/9ece96f9793976a33011e03be2c61a8680655e50))
+
 <a name="1.1.0"></a>
 ## [1.1.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.1.0) (2025-06-11)
 
