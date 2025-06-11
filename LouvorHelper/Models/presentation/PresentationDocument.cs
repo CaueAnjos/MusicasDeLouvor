@@ -124,11 +124,17 @@ internal class PresentationDocument
         using var presentationDoc = TemplateManager.CreateFromTemplate(_templatePath!, filepath);
         var presentationPart = presentationDoc.PresentationPart!;
 
-        // Clear existing slides but keep master
+        // Clear existing slides but keep master and layouts
         ClearExistingSlides(presentationPart);
 
-        // Add our slides
-        AddSlidesToPresentation(presentationPart);
+        // Get or create layout manager
+        var layoutManager = new SlideLayoutManager(presentationPart);
+
+        // Add our slides with proper layout references
+        AddSlidesToPresentationWithLayouts(presentationPart, layoutManager);
+
+        // Ensure required elements are present
+        EnsureRequiredPresentationElements(presentationPart);
 
         presentationPart.Presentation.Save();
     }
@@ -148,8 +154,8 @@ internal class PresentationDocument
         var layoutManager = new SlideLayoutManager(presentationPart);
         layoutManager.CreateDefaultLayouts(slideMasterPart);
 
-        // Add slides
-        AddSlidesToPresentation(presentationPart);
+        // Add slides with proper layout references
+        AddSlidesToPresentationWithLayouts(presentationPart, layoutManager);
 
         // Set slide size (16:9 widescreen)
         presentationPart.Presentation.SlideSize = new P.SlideSize()
@@ -159,7 +165,46 @@ internal class PresentationDocument
             Type = P.SlideSizeValues.Screen16x9,
         };
 
+        // Ensure required elements are present
+        EnsureRequiredPresentationElements(presentationPart);
+
         presentationPart.Presentation.Save();
+    }
+
+    private void AddSlidesToPresentationWithLayouts(
+        PresentationPart presentationPart,
+        SlideLayoutManager layoutManager
+    )
+    {
+        var slideIdList = new P.SlideIdList();
+        uint slideId = 256;
+        int relationshipId = GetNextRelationshipId(presentationPart);
+
+        foreach (var slide in _slides)
+        {
+            var slidePart = presentationPart.AddNewPart<SlidePart>($"rId{relationshipId}");
+
+            // Get appropriate layout
+            var layoutPart = layoutManager.GetLayout(slide.Layout);
+
+            // Create slide with layout reference
+            slidePart.Slide = SlideFactory.CreateSlideWithLayout(slide, layoutPart);
+
+            // Add relationship to layout
+            slidePart.AddPart(layoutPart);
+
+            slidePart.Slide.Save();
+
+            slideIdList.Append(
+                new P.SlideId()
+                {
+                    Id = (UInt32Value)slideId++,
+                    RelationshipId = $"rId{relationshipId++}",
+                }
+            );
+        }
+
+        presentationPart.Presentation.SlideIdList = slideIdList;
     }
 
     private void AddSlidesToPresentation(PresentationPart presentationPart)
@@ -202,6 +247,46 @@ internal class PresentationDocument
         }
     }
 
+    private static void EnsureRequiredPresentationElements(PresentationPart presentationPart)
+    {
+        var presentation = presentationPart.Presentation;
+
+        // Ensure SlideIdList exists
+        if (presentation.SlideIdList == null)
+        {
+            presentation.SlideIdList = new P.SlideIdList();
+        }
+
+        // Ensure SlideMasterIdList exists
+        if (presentation.SlideMasterIdList == null)
+        {
+            presentation.SlideMasterIdList = new P.SlideMasterIdList();
+        }
+
+        // Ensure slide size is set
+        if (presentation.SlideSize == null)
+        {
+            presentation.SlideSize = new P.SlideSize()
+            {
+                Cx = 12192000,
+                Cy = 6858000,
+                Type = P.SlideSizeValues.Screen16x9,
+            };
+        }
+
+        // Ensure notes size is set
+        if (presentation.NotesSize == null)
+        {
+            presentation.NotesSize = new P.NotesSize() { Cx = 12192000, Cy = 9144000 };
+        }
+
+        // Ensure default text styles exist
+        if (presentation.DefaultTextStyle == null)
+        {
+            presentation.DefaultTextStyle = new P.DefaultTextStyle();
+        }
+    }
+
     private static int GetNextRelationshipId(PresentationPart presentationPart)
     {
         // Find the highest relationship ID and return next available
@@ -222,15 +307,24 @@ internal class PresentationDocument
     private SlideMasterPart CreateSlideMaster(PresentationPart presentationPart)
     {
         var slideMasterPart = presentationPart.AddNewPart<SlideMasterPart>("rId1");
+
+        // Create theme part
+        var themePart = slideMasterPart.AddNewPart<ThemePart>("rId1");
+        themePart.Theme = CreateDefaultTheme();
+
         slideMasterPart.SlideMaster = new P.SlideMaster(
             new P.CommonSlideData(
                 new P.ShapeTree(
                     new P.NonVisualGroupShapeProperties(
                         new P.NonVisualDrawingProperties() { Id = 1, Name = "" },
-                        new P.NonVisualGroupShapeDrawingProperties(),
+                        new P.NonVisualGroupShapeProperties(),
                         new P.ApplicationNonVisualDrawingProperties()
                     ),
-                    new P.GroupShapeProperties(new D.TransformGroup())
+                    new P.GroupShapeProperties(new D.TransformGroup()),
+                    // Add title placeholder
+                    CreateMasterTitlePlaceholder(),
+                    // Add content placeholder
+                    CreateMasterContentPlaceholder()
                 )
             ),
             new P.ColorMap()
@@ -255,5 +349,242 @@ internal class PresentationDocument
         );
 
         return slideMasterPart;
+    }
+
+    private static P.Shape CreateMasterTitlePlaceholder()
+    {
+        return new P.Shape(
+            new P.NonVisualShapeProperties(
+                new P.NonVisualDrawingProperties() { Id = 2, Name = "Title Placeholder 1" },
+                new P.NonVisualShapeDrawingProperties(new D.ShapeLocks() { NoGrouping = true }),
+                new P.ApplicationNonVisualDrawingProperties(
+                    new P.PlaceholderShape() { Type = P.PlaceholderValues.Title }
+                )
+            ),
+            new P.ShapeProperties(),
+            new P.TextBody(
+                new D.BodyProperties(),
+                new D.ListStyle(),
+                new D.Paragraph(new D.EndParagraphRunProperties() { Language = "en-US" })
+            )
+        );
+    }
+
+    private static P.Shape CreateMasterContentPlaceholder()
+    {
+        return new P.Shape(
+            new P.NonVisualShapeProperties(
+                new P.NonVisualDrawingProperties() { Id = 3, Name = "Content Placeholder 2" },
+                new P.NonVisualShapeDrawingProperties(new D.ShapeLocks() { NoGrouping = true }),
+                new P.ApplicationNonVisualDrawingProperties(
+                    new P.PlaceholderShape() { Type = P.PlaceholderValues.Body }
+                )
+            ),
+            new P.ShapeProperties(),
+            new P.TextBody(
+                new D.BodyProperties(),
+                new D.ListStyle(),
+                new D.Paragraph(new D.EndParagraphRunProperties() { Language = "en-US" })
+            )
+        );
+    }
+
+    private static D.Theme CreateDefaultTheme()
+    {
+        return new D.Theme(
+            new D.ThemeElements(
+                new D.ColorScheme(
+                    new D.Dark1Color(new D.SystemColor() { Val = D.SystemColorValues.WindowText }),
+                    new D.Light1Color(new D.SystemColor() { Val = D.SystemColorValues.Window }),
+                    new D.Dark2Color(new D.RgbColorModelHex() { Val = "1F497D" }),
+                    new D.Light2Color(new D.RgbColorModelHex() { Val = "EEECE1" }),
+                    new D.Accent1Color(new D.RgbColorModelHex() { Val = "4F81BD" }),
+                    new D.Accent2Color(new D.RgbColorModelHex() { Val = "F79646" }),
+                    new D.Accent3Color(new D.RgbColorModelHex() { Val = "9BBB59" }),
+                    new D.Accent4Color(new D.RgbColorModelHex() { Val = "8064A2" }),
+                    new D.Accent5Color(new D.RgbColorModelHex() { Val = "4BACC6" }),
+                    new D.Accent6Color(new D.RgbColorModelHex() { Val = "F366A7" }),
+                    new D.Hyperlink(new D.RgbColorModelHex() { Val = "0000FF" }),
+                    new D.FollowedHyperlinkColor(new D.RgbColorModelHex() { Val = "800080" })
+                )
+                {
+                    Name = "Office",
+                },
+                new D.FontScheme(
+                    new D.MajorFont(
+                        new D.LatinFont() { Typeface = "Calibri Light" },
+                        new D.EastAsianFont() { Typeface = "" },
+                        new D.ComplexScriptFont() { Typeface = "" }
+                    ),
+                    new D.MinorFont(
+                        new D.LatinFont() { Typeface = "Calibri" },
+                        new D.EastAsianFont() { Typeface = "" },
+                        new D.ComplexScriptFont() { Typeface = "" }
+                    )
+                )
+                {
+                    Name = "Office",
+                },
+                new D.FormatScheme(
+                    new D.FillStyleList(
+                        new D.SolidFill(new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }),
+                        new D.GradientFill(
+                            new D.GradientStopList(
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 0,
+                                },
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 100000,
+                                }
+                            ),
+                            new D.LinearGradientFill() { Angle = 5400000, Scaled = true }
+                        ),
+                        new D.GradientFill(
+                            new D.GradientStopList(
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 0,
+                                },
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 100000,
+                                }
+                            ),
+                            new D.LinearGradientFill() { Angle = 5400000, Scaled = true }
+                        )
+                    ),
+                    new D.LineStyleList(
+                        new D.Outline(
+                            new D.SolidFill(
+                                new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                            ),
+                            new D.PresetDash() { Val = D.PresetLineDashValues.Solid }
+                        )
+                        {
+                            Width = 9525,
+                        },
+                        new D.Outline(
+                            new D.SolidFill(
+                                new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                            )
+                        )
+                        {
+                            Width = 25400,
+                        },
+                        new D.Outline(
+                            new D.SolidFill(
+                                new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                            )
+                        )
+                        {
+                            Width = 38100,
+                        }
+                    ),
+                    new D.EffectStyleList(
+                        new D.EffectStyle(
+                            new D.EffectList(
+                                new D.OuterShadow(
+                                    new D.RgbColorModelHex(new D.Alpha() { Val = 38000 })
+                                    {
+                                        Val = "000000",
+                                    }
+                                )
+                                {
+                                    BlurRadius = 40000L,
+                                    Distance = 20000L,
+                                    Direction = 5400000,
+                                    RotateWithShape = false,
+                                }
+                            )
+                        ),
+                        new D.EffectStyle(
+                            new D.EffectList(
+                                new D.OuterShadow(
+                                    new D.RgbColorModelHex(new D.Alpha() { Val = 35000 })
+                                    {
+                                        Val = "000000",
+                                    }
+                                )
+                                {
+                                    BlurRadius = 40000L,
+                                    Distance = 23000L,
+                                    Direction = 5400000,
+                                    RotateWithShape = false,
+                                }
+                            )
+                        ),
+                        new D.EffectStyle(
+                            new D.EffectList(
+                                new D.OuterShadow(
+                                    new D.RgbColorModelHex(new D.Alpha() { Val = 35000 })
+                                    {
+                                        Val = "000000",
+                                    }
+                                )
+                                {
+                                    BlurRadius = 40000L,
+                                    Distance = 23000L,
+                                    Direction = 5400000,
+                                    RotateWithShape = false,
+                                }
+                            )
+                        )
+                    ),
+                    new D.BackgroundFillStyleList(
+                        new D.SolidFill(new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }),
+                        new D.GradientFill(
+                            new D.GradientStopList(
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 0,
+                                },
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 100000,
+                                }
+                            ),
+                            new D.LinearGradientFill() { Angle = 5400000, Scaled = true }
+                        ),
+                        new D.GradientFill(
+                            new D.GradientStopList(
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 0,
+                                },
+                                new D.GradientStop(
+                                    new D.SchemeColor() { Val = D.SchemeColorValues.PhColor }
+                                )
+                                {
+                                    Position = 100000,
+                                }
+                            ),
+                            new D.LinearGradientFill() { Angle = 5400000, Scaled = true }
+                        )
+                    )
+                )
+                {
+                    Name = "Office",
+                }
+            )
+        )
+        {
+            Name = "Office Theme",
+        };
     }
 }

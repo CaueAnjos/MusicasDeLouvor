@@ -2,7 +2,7 @@ namespace LouvorHelper.Models.Presentation;
 
 public enum SlideLayoutType
 {
-    Title,
+    Title = 0,
     Lyrics,
     TitleAndContent,
     TwoColumn,
