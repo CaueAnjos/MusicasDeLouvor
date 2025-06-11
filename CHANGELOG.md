@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.3.0"></a>
+## [1.3.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.3.0) (2025-06-11)
+
+### Features
+
+* **publish:** add PublishAutomated for automating publishment ([51af1d7](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/51af1d70e08014cc118e32857316825805f7f389))
+
 <a name="1.2.0"></a>
 ## [1.2.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.2.0) (2025-06-11)
 
