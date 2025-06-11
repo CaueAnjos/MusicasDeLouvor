@@ -13,6 +13,7 @@ class Program
 
         rootCommand.AddCommand(new GetCommand());
         rootCommand.AddCommand(new CompileCommand());
+        rootCommand.AddCommand(new MedleyCommand());
 
         return await rootCommand.InvokeAsync(args);
     }
