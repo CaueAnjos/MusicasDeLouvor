@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.1.0"></a>
+## [1.1.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.1.0) (2025-06-11)
+
+### Features
+
+* **Presentation:** add compatibility with themes ([9f850ae](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/9f850aec4ec80d51869ad995e9d6d69db8ba0794))
+* **Presentations:** add templeto to presentation ([2965e00](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/2965e0054d3c903c64de7f32205e648d95693fed))
+* **Presentations:** recompile all musics ([8911ea4](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/8911ea4d4a51facae472768bd80361cf22f8d531))
+* **Template:** add template compatibility to slides ([1024413](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/102441325ce6442b3d6eae6884db5df21b526cd4))
+
+### Bug Fixes
+
+* **CHANGLOG:** remove repeted CHANGELOG ([64497c0](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/64497c00ff0d3e97f3fc9b39ddf3ee74c76798e1))
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.0.2) (2025-06-08)
 
