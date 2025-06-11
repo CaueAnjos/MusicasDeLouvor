@@ -4,6 +4,22 @@ namespace LouvorHelper.Utils;
 
 static class Notify
 {
+    public static bool YesNoBox(string message, bool defaultValue = false)
+    {
+        Notify.Warning(message);
+        Notify.Warning("[y/n]");
+        string? input = Console.ReadLine();
+        if (string.IsNullOrEmpty(input))
+            return defaultValue;
+
+        return input.ToLower() switch
+        {
+            "y" => true,
+            "n" => false,
+            _ => defaultValue,
+        };
+    }
+
     public static void Info(string message)
     {
         var color = Console.ForegroundColor;
