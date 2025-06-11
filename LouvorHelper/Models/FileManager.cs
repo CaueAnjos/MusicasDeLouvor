@@ -56,4 +56,16 @@ internal class FileManager
                 yield return music;
         }
     }
+
+    public void Clear(string directory)
+    {
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
+        Directory.Delete(directory, true);
+        Directory.CreateDirectory(directory);
+    }
+
+    public void ClearDownloads() => Clear(DownloadPath);
+
+    public void ClearCompiled() => Clear(CompileOutputPath);
 }
