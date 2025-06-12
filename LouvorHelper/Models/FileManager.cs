@@ -21,9 +21,7 @@ internal class FileManager
 
     public async Task SaveAsync(Music music)
     {
-        string formattedTitle = music.Title.ToUpper().Replace(' ', '_').Trim();
-        string formattedArtist = music.Artist.ToLower().Replace(' ', '_').Trim();
-        string filePath = Path.Combine(DownloadPath, $"{formattedTitle}-{formattedArtist}.json");
+        string filePath = Path.Combine(DownloadPath, ApropriateFileName(music, ".json"));
 
         string json = JsonSerializer.Serialize(music, _jsonOptions);
 
@@ -68,4 +66,12 @@ internal class FileManager
     public void ClearDownloads() => Clear(DownloadPath);
 
     public void ClearCompiled() => Clear(CompileOutputPath);
+
+    public string ApropriateFileName(Music music, string extension = ".pptx")
+    {
+        string titleFormatted = music.Title.ToUpper().Trim().Replace(' ', '_');
+        string artistFormatted = music.Artist.ToLower().Trim().Replace(' ', '_');
+        string fileName = $"{titleFormatted}-{artistFormatted}{extension}";
+        return fileName;
+    }
 }

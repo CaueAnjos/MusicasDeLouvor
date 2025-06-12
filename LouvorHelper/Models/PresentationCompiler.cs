@@ -39,6 +39,7 @@ internal class PresentationCompiler
         FileManager.ClearCompiled();
 
         List<Task> tasks = new();
+        int errorCount = 0;
         await foreach (Music music in FileManager.LoadAsync())
         {
             Notify.Info($"Compilando {music.Title} - {music.Artist}");
@@ -46,42 +47,35 @@ internal class PresentationCompiler
             Musics.Enqueue(music);
             try
             {
-                string titleFormatted = music.Title.ToUpper().Trim().Replace(' ', '_');
-                string artistFormatted = music.Artist.ToLower().Trim().Replace(' ', '_');
-                string fileName = SanitizeFileName($"{titleFormatted}-{artistFormatted}.pptx");
-                string filePath = Path.Combine(FileManager.CompileOutputPath, fileName);
+                string filePath = Path.Combine(
+                    FileManager.CompileOutputPath,
+                    FileManager.ApropriateFileName(music)
+                );
+
                 tasks.Add(
                     Task.Run(() =>
                     {
                         PresentationDocument presentation = new(music);
                         presentation.SetTemplate(TemplatePath);
                         presentation.Save(filePath);
-                        Notify.Success($"Compilado com sucesso: {fileName}");
+                        Notify.Success($"Compilado com sucesso: {Path.GetFileName(filePath)}");
                     })
                 );
             }
             catch (NullReferenceException)
             {
                 Notify.Error($"Erro: json não foi formatado corratamente");
+                errorCount++;
             }
         }
         await Task.WhenAll(tasks);
 
-        Notify.Success(
-            $"Compilação concluída! {Musics.Count} apresentações criadas em '{FileManager.CompileOutputPath}'"
-        );
-    }
+        if (errorCount > 0)
+            Notify.Warning($"Ocorreram {errorCount} erros ao compilar apresentações");
 
-    /// <summary>
-    /// Sanitizes filename to remove invalid characters
-    /// </summary>
-    private string SanitizeFileName(string fileName)
-    {
-        var invalidChars = Path.GetInvalidFileNameChars();
-        var sanitized = string.Join(
-            "_",
-            fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)
-        );
-        return sanitized.Length > 100 ? sanitized.Substring(0, 100) + ".pptx" : sanitized;
+        if (errorCount < Musics.Count)
+            Notify.Success(
+                $"Compilação concluída! {Musics.Count - errorCount} apresentações criadas em '{FileManager.CompileOutputPath}'"
+            );
     }
 }
