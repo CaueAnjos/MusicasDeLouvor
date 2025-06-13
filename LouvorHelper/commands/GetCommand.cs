@@ -30,15 +30,12 @@ internal class GetCommand : Command
         Notify.Info($"Buscando letra para: {title} {"de " + author}");
 
         // TODO: add more providers: Letras.Mus.br
-        List<IProvider> providers = [new VagalumeProvider(), new CifraClubProvider()];
+        ProviderContainer providerContainer = new(
+            [new VagalumeProvider(), new CifraClubProvider()]
+        );
+        await providerContainer.GetLyricsAsync(title, author);
 
-        List<Task<string?>> tasks =
-        [
-            providers[0].GetLyrics(title, author),
-            providers[1].GetLyrics(title, author),
-        ];
-
-        string? lyrics = (await Task.WhenAll(tasks)).FirstOrDefault(t => t is not null);
+        string? lyrics = SelectProvider(providerContainer);
 
         if (lyrics is not null)
         {
@@ -52,5 +49,30 @@ internal class GetCommand : Command
         }
         else
             Notify.Error("Letra não encontrada");
+    }
+
+    private string? SelectProvider(ProviderContainer container)
+    {
+        if (container.GoodProvidersResponse == 0)
+            return null;
+
+        if (container.GoodProvidersResponse == 1)
+            return container.GetDefaultLyrics();
+
+        foreach (var result in container.Lyrics)
+        {
+            if (result.Value is null)
+                Notify.Info($"{result.Key}");
+            else
+                Notify.Success($"{result.Key}");
+        }
+
+        Notify.Info("Qual você deseja usar?");
+        string? choice = Console.ReadLine();
+
+        if (!string.IsNullOrEmpty(choice) && container.Lyrics.ContainsKey(choice))
+            return container.Lyrics[choice];
+        else
+            return container.GetDefaultLyrics();
     }
 }

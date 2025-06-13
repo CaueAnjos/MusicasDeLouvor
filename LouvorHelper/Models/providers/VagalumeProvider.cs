@@ -5,7 +5,9 @@ namespace LouvorHelper.Models.Providers;
 
 internal class VagalumeProvider : IProvider
 {
-    public async Task<string?> GetLyrics(string title, string artist)
+    public string Label { get; } = "Vagalume";
+
+    public async Task<KeyValuePair<string, string?>> GetLyrics(string title, string artist)
     {
         HttpClient client = new();
         try
@@ -20,7 +22,7 @@ internal class VagalumeProvider : IProvider
                 RegexOptions.Singleline
             );
             if (!match.Success)
-                return null;
+                return ProviderReturnPair.ReturnPair(Label);
 
             string rawLyrics = match.Groups[1].Value;
 
@@ -28,11 +30,11 @@ internal class VagalumeProvider : IProvider
             rawLyrics = Regex.Replace(rawLyrics, @"\n{2,}", "\n\n"); // Múltiplas quebras → 2 quebras
 
             string cleanLyrics = rawLyrics.Trim();
-            return cleanLyrics;
+            return ProviderReturnPair.ReturnPair(Label, cleanLyrics);
         }
         catch (HttpRequestException)
         {
-            return null;
+            return ProviderReturnPair.ReturnPair(Label);
         }
     }
 

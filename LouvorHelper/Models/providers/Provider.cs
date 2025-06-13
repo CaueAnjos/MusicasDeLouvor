@@ -2,5 +2,7 @@ namespace LouvorHelper.Models.Providers;
 
 internal interface IProvider
 {
-    Task<string?> GetLyrics(string title, string artist);
+    // KeyValuePair<string? Lyrics, string Lable>
+    Task<KeyValuePair<string, string?>> GetLyrics(string title, string artist);
+    string Label { get; }
 }
