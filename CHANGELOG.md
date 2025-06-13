@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.4.0"></a>
+## [1.4.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.4.0) (2025-06-12)
+
+### Features
+
+* **Musics/Presentations:** remove all musics and presentations ([c80a6e7](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/c80a6e77b6e244efad43d94a2ff7db500f1d06d3))
+* **ProviderSelector:** add provider selection to get command ([9840035](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/98400358a2394ea1ef01dd773569e19a7d0f4ba1))
+
+### Bug Fixes
+
+* **CifraClubProvider:** fix lyrics formatting ([bec5399](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/bec53994768be86d66d3e6976250fcf4d7c6f200))
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.3.1) (2025-06-11)
 
