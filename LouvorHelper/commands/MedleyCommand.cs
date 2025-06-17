@@ -1,7 +1,7 @@
 using System.CommandLine;
 using System.Text;
-using LouvorHelper.Models;
-using LouvorHelper.Utils;
+using LouvorHelperCore.Models;
+using LouvorHelperCore.Utils;
 
 namespace LouvorHelper.Commands;
 

@@ -1,5 +1,5 @@
 using System.CommandLine;
-using LouvorHelper.Models;
+using LouvorHelperCore.Models;
 
 namespace LouvorHelper.Commands;
 

@@ -1,6 +1,6 @@
-namespace LouvorHelper.Models.Providers;
+namespace LouvorHelperCore.Models.Providers;
 
-internal class ProviderContainer
+public class ProviderContainer
 {
     private List<IProvider> _providers;
     public Dictionary<string, string?> Lyrics { get; private set; }

@@ -1,9 +1,9 @@
-using LouvorHelper.Models.Presentation;
-using LouvorHelper.Utils;
+using LouvorHelperCore.Models.Presentation;
+using LouvorHelperCore.Utils;
 
-namespace LouvorHelper.Models;
+namespace LouvorHelperCore.Models;
 
-internal class PresentationCompiler
+public class PresentationCompiler
 {
     public Queue<Music> Musics { get; private set; }
     public FileManager FileManager { get; private set; }

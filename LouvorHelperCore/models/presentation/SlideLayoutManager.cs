@@ -2,12 +2,12 @@ using DocumentFormat.OpenXml.Packaging;
 using D = DocumentFormat.OpenXml.Drawing;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
 /// <summary>
 /// Manages slide layouts and their creation
 /// </summary>
-public class SlideLayoutManager
+internal class SlideLayoutManager
 {
     private readonly PresentationPart _presentationPart;
     private readonly Dictionary<SlideLayoutType, SlideLayoutPart> _layouts;

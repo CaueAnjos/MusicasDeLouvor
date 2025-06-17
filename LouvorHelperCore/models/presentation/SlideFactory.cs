@@ -2,12 +2,12 @@ using DocumentFormat.OpenXml.Packaging;
 using D = DocumentFormat.OpenXml.Drawing;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
 /// <summary>
 /// Factory for creating OpenXML slide objects
 /// </summary>
-public static class SlideFactory
+internal static class SlideFactory
 {
     /// <summary>
     /// Creates an OpenXML slide from a Slide object

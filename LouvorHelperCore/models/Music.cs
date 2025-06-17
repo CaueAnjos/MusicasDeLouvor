@@ -1,6 +1,6 @@
-namespace LouvorHelper.Models;
+namespace LouvorHelperCore.Models;
 
-class Music
+public class Music
 {
     public Music(string title, string artist, string lyrics)
     {

@@ -1,10 +1,10 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using LouvorHelper.Utils;
+using LouvorHelperCore.Utils;
 using D = DocumentFormat.OpenXml.Drawing;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
 /// <summary>
 /// Main presentation document class - handles creating PowerPoint presentations from music data

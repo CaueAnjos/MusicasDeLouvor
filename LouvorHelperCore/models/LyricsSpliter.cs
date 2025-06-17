@@ -1,9 +1,9 @@
-namespace LouvorHelper.Models;
+namespace LouvorHelperCore.Models;
 
 /// <summary>
 /// Utility class for splitting lyrics into manageable sections for slides
 /// </summary>
-public static class LyricsSplitter
+internal static class LyricsSplitter
 {
     /// <summary>
     /// Splits lyrics into manageable sections for slides

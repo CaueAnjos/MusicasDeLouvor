@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
 
-namespace LouvorHelper.Models;
+namespace LouvorHelperCore.Models;
 
-internal class FileManager
+public class FileManager
 {
     public FileManager()
     {

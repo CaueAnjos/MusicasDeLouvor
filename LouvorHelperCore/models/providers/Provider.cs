@@ -1,7 +1,7 @@
-namespace LouvorHelper.Models.Providers;
+namespace LouvorHelperCore.Models.Providers;
 
 // TODO: create a proper formatter class for formatting lyrics
-internal interface IProvider
+public interface IProvider
 {
     // KeyValuePair<string? Lyrics, string Lable>
     Task<KeyValuePair<string, string?>> GetLyrics(string title, string artist);

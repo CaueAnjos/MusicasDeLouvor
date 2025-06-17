@@ -1,9 +1,9 @@
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
 /// <summary>
 /// Represents a single slide with its content and layout
 /// </summary>
-public class Slide
+internal class Slide
 {
     public SlideLayoutType Layout { get; set; }
     public string Title { get; set; } = string.Empty;

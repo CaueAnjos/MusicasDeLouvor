@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace LouvorHelper.Utils;
+namespace LouvorHelperCore.Utils;
 
 internal static class StringUtils
 {
@@ -20,8 +20,6 @@ internal static class StringUtils
             }
         }
 
-        return stringBuilder
-            .ToString()
-            .Normalize(NormalizationForm.FormC);
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }

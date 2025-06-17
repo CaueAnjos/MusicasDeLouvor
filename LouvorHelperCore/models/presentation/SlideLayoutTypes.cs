@@ -1,6 +1,6 @@
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
-public enum SlideLayoutType
+internal enum SlideLayoutType
 {
     Title = 0,
     Lyrics,

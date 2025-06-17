@@ -1,12 +1,12 @@
 using DocumentFormat.OpenXml.Packaging;
 using P = DocumentFormat.OpenXml.Presentation;
 
-namespace LouvorHelper.Models.Presentation;
+namespace LouvorHelperCore.Models.Presentation;
 
 /// <summary>
 /// Handles PowerPoint template integration
 /// </summary>
-public static class TemplateManager
+internal static class TemplateManager
 {
     /// <summary>
     /// Creates a new presentation document from an existing template

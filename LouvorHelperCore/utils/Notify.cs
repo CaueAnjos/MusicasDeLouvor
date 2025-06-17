@@ -1,8 +1,8 @@
 using Dumpify;
 
-namespace LouvorHelper.Utils;
+namespace LouvorHelperCore.Utils;
 
-static class Notify
+public static class Notify
 {
     public static bool YesNoBox(string message, bool defaultValue = false)
     {

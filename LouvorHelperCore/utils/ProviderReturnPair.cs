@@ -1,4 +1,4 @@
-namespace LouvorHelper.Utils;
+namespace LouvorHelperCore.Utils;
 
 internal static class ProviderReturnPair
 {
