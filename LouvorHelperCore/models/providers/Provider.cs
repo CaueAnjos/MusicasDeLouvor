@@ -2,7 +2,6 @@ using LouvorHelperCore.Models.Providers.Formatters;
 
 namespace LouvorHelperCore.Models.Providers;
 
-// TODO: create a proper formatter class for formatting lyrics
 public abstract class Provider
 {
     protected Provider(string url, string label, IFormatter formatter)
