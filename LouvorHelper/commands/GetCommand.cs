@@ -35,7 +35,6 @@ internal class GetCommand : Command
     {
         Notify.Info($"Buscando letra para: {title} {"de " + author}");
 
-        // TODO: add more providers: Letras.Mus.br
         ProviderContainer providerContainer = new(
             [new VagalumeProvider(), new CifraClubProvider(), new LetrasMusProvider()]
         );
