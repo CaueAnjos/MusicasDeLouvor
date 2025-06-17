@@ -8,7 +8,9 @@ public class BasicFormatter : IFormatter
     {
         string cleanedLyrics = lyrics;
 
-        cleanedLyrics = Regex.Replace(cleanedLyrics, @"<br>", "\n");
+        cleanedLyrics = Regex.Replace(cleanedLyrics, @"</p><p>", "\n\n");
+        cleanedLyrics = Regex.Replace(cleanedLyrics, @"<p>|</p>", "");
+        cleanedLyrics = Regex.Replace(cleanedLyrics, @"<br>|<br/>", "\n");
         cleanedLyrics = Regex.Replace(cleanedLyrics, @"<.*>", "");
         cleanedLyrics = Regex.Replace(cleanedLyrics, @"[A-Z].*\|", "");
         cleanedLyrics = Regex.Replace(cleanedLyrics, @"Parte [0-9]* de [0-9]*", "");
