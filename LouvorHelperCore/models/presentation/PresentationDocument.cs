@@ -29,12 +29,8 @@ internal class PresentationDocument
     /// <returns>This PresentationDocument instance for method chaining</returns>
     public PresentationDocument SetTemplate(string templatePath)
     {
-        if (!TemplateManager.IsValidTemplate(templatePath))
-        {
-            throw new ArgumentException($"Invalid template file: {templatePath}");
-        }
-
-        _templatePath = templatePath;
+        if (TemplateManager.IsValidTemplate(templatePath))
+            _templatePath = templatePath;
         return this;
     }
 

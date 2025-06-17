@@ -18,14 +18,20 @@ internal class GetCommand : Command
         {
             IsRequired = true,
         };
+        var autoCompileOption = new Option<bool>(
+            ["--auto-compile", "--compilar", "-c"],
+            getDefaultValue: () => true,
+            "Compila automaticamente as apresentações"
+        );
 
         AddOption(titleOption);
         AddOption(authorOption);
+        AddOption(autoCompileOption);
 
-        this.SetHandler(CommandAction, titleOption, authorOption);
+        this.SetHandler(CommandAction, titleOption, authorOption, autoCompileOption);
     }
 
-    private async Task CommandAction(string title, string author)
+    private async Task CommandAction(string title, string author, bool autoCompile)
     {
         Notify.Info($"Buscando letra para: {title} {"de " + author}");
 
@@ -46,6 +52,13 @@ internal class GetCommand : Command
             await fileManager.SaveAsync(music);
 
             Notify.Success($"Arquivo salvo em: {fileManager.DownloadPath}");
+
+            if (autoCompile)
+            {
+                PresentationCompiler compiler = new();
+                compiler.CompileMusic(music);
+                Notify.Success($"{music.Title} was compiled");
+            }
         }
         else
             Notify.Error("Letra não encontrada");
