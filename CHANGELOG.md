@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.5.0"></a>
+## [1.5.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.5.0) (2025-06-17)
+
+### Features
+
+* **Formatters:** add formatters for esealy format any provider ([2a49ba9](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/2a49ba9428a9ee5613a9d1f348fbdb01e7ff5059))
+* **GetCommand:** add autoCompileOption for automaticaly compiling musics before getting then ([d8f07eb](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/d8f07eb421b505d19693939cfb981bad3a358a47))
+* **GetCommand:** add LetrasMusProvider ([2caa21b](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/2caa21bb20e36b1c71b0fc40681199aa83678d38))
+* **musics/presentations:** add more musics ([9a00d99](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/9a00d997806931352f50bae65322635606dc5324))
+* **PresentationCompiler:** add sigle music compile ([fc8b493](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/fc8b4939f7bb5d51874fb8b7017bc2d5282758b2))
+* **Presentations:** compile all musics ([1bbeb02](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/1bbeb02620744351a852861dbb5b6b592b64bda6))
+* **Providers:** add LetrasMus provider ([3399a86](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/3399a8687c190a4bb851d0be4829cf7086d3dc78))
+
+### Bug Fixes
+
+* **comments:** remove todo commend because completed ([6bb9ce9](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/6bb9ce97f57dc7ed82d7b36943e91b7ae09fdad6))
+* **PresentationCompiler:** fix compiling queue issues ([075b4ce](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/075b4cebd95deaa067810a2dee7c62ac661789bd))
+
 <a name="1.4.0"></a>
 ## [1.4.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.4.0) (2025-06-12)
 
