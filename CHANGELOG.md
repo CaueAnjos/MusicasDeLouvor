@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.5.1"></a>
+## [1.5.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.5.1) (2025-06-17)
+
+### Bug Fixes
+
+* **comments:** remove todo comment because completed ([f069bd6](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/f069bd67fabf7b8428634ec63c70e59dae8799e0))
+
 <a name="1.5.0"></a>
 ## [1.5.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.5.0) (2025-06-17)
 
