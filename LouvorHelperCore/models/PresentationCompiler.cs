@@ -49,26 +49,27 @@ public class PresentationCompiler
     {
         FileManager.ClearCompiled();
 
-        int index = 0;
         int maxTasksPerCompileCicle = 5;
-        int count = Musics.Count;
-        Task[] tasks = new Task[maxTasksPerCompileCicle];
+        List<Task> tasks = new List<Task>(maxTasksPerCompileCicle);
 
         foreach (Music music in Musics)
         {
-            tasks[index] = Task.Run(() =>
-            {
-                CompileMusic(music);
-            });
+            tasks.Add(
+                Task.Run(() =>
+                {
+                    CompileMusic(music);
+                })
+            );
 
-            if (index >= maxTasksPerCompileCicle || count == 0)
+            if (tasks.Count >= maxTasksPerCompileCicle)
             {
                 await Task.WhenAll(tasks);
-                index = 0;
+                tasks.Clear();
             }
-
-            count--;
         }
+
+        if (tasks.Count > 0)
+            await Task.WhenAll(tasks);
     }
 
     public async Task CompileAllAsync()
