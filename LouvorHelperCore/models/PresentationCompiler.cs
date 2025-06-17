@@ -32,50 +32,57 @@ public class PresentationCompiler
             Musics.Enqueue(music);
     }
 
-    public async Task CompileAllAsync()
+    public void CompileMusic(Music music)
     {
-        Notify.Info("Iniciando compilação...");
+        string filePath = Path.Combine(
+            FileManager.CompileOutputPath,
+            FileManager.ApropriateFileName(music, extension: ".pptx")
+        );
 
+        PresentationDocument presentation = new(music);
+        presentation.SetTemplate(TemplatePath);
+        presentation.Save(filePath);
+        Notify.Success($"Compilado com sucesso: {Path.GetFileName(filePath)}");
+    }
+
+    public async Task CompileQueueAsync()
+    {
         FileManager.ClearCompiled();
 
-        List<Task> tasks = new();
-        int errorCount = 0;
+        int index = 0;
+        int maxTasksPerCompileCicle = 5;
+        int count = Musics.Count;
+        Task[] tasks = new Task[maxTasksPerCompileCicle];
+
+        foreach (Music music in Musics)
+        {
+            tasks[index] = Task.Run(() =>
+            {
+                CompileMusic(music);
+            });
+
+            if (index >= maxTasksPerCompileCicle || count == 0)
+            {
+                await Task.WhenAll(tasks);
+                index = 0;
+            }
+
+            count--;
+        }
+    }
+
+    public async Task CompileAllAsync()
+    {
         await foreach (Music music in FileManager.LoadAsync())
         {
             Notify.Info($"Compilando {music.Title} - {music.Artist}");
-
             Musics.Enqueue(music);
-            try
-            {
-                string filePath = Path.Combine(
-                    FileManager.CompileOutputPath,
-                    FileManager.ApropriateFileName(music)
-                );
-
-                tasks.Add(
-                    Task.Run(() =>
-                    {
-                        PresentationDocument presentation = new(music);
-                        presentation.SetTemplate(TemplatePath);
-                        presentation.Save(filePath);
-                        Notify.Success($"Compilado com sucesso: {Path.GetFileName(filePath)}");
-                    })
-                );
-            }
-            catch (NullReferenceException)
-            {
-                Notify.Error($"Erro: json não foi formatado corratamente");
-                errorCount++;
-            }
         }
-        await Task.WhenAll(tasks);
 
-        if (errorCount > 0)
-            Notify.Warning($"Ocorreram {errorCount} erros ao compilar apresentações");
+        await CompileQueueAsync();
 
-        if (errorCount < Musics.Count)
-            Notify.Success(
-                $"Compilação concluída! {Musics.Count - errorCount} apresentações criadas em '{FileManager.CompileOutputPath}'"
-            );
+        Notify.Success(
+            $"Compilação concluída! {Musics.Count} apresentações criadas em '{FileManager.CompileOutputPath}'"
+        );
     }
 }
