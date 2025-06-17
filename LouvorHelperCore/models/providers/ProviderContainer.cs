@@ -2,22 +2,26 @@ namespace LouvorHelperCore.Models.Providers;
 
 public class ProviderContainer
 {
-    private List<IProvider> _providers;
+    public List<Provider> Providers { get; private set; }
     public Dictionary<string, string?> Lyrics { get; private set; }
 
-    public ProviderContainer(List<IProvider> providers)
+    public ProviderContainer(List<Provider> providers)
     {
-        _providers = providers;
+        Providers = providers;
         Lyrics = new();
     }
 
     public async Task GetLyricsAsync(string title, string artist)
     {
-        List<Task<KeyValuePair<string, string?>>> tasks = new();
-        foreach (IProvider provider in _providers)
-            tasks.Add(provider.GetLyrics(title, artist));
+        var tasks = Providers
+            .Select(async provider =>
+            {
+                var lyrics = await provider.GetLyricsAsync(title, artist);
+                Lyrics[provider.Label] = lyrics;
+            })
+            .ToList();
 
-        Lyrics = new(await Task.WhenAll(tasks));
+        await Task.WhenAll(tasks);
     }
 
     public string? GetDefaultLyrics()
