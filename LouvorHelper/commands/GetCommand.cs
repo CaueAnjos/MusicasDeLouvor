@@ -37,7 +37,7 @@ internal class GetCommand : Command
 
         // TODO: add more providers: Letras.Mus.br
         ProviderContainer providerContainer = new(
-            [new VagalumeProvider(), new CifraClubProvider()]
+            [new VagalumeProvider(), new CifraClubProvider(), new LetrasMusProvider()]
         );
         await providerContainer.GetLyricsAsync(title, author);
 
