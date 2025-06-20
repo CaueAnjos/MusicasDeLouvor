@@ -14,6 +14,7 @@ class Program
         rootCommand.AddCommand(new GetCommand());
         rootCommand.AddCommand(new CompileCommand());
         rootCommand.AddCommand(new MedleyCommand());
+        rootCommand.AddCommand(new ListCommand());
 
         return await rootCommand.InvokeAsync(args);
     }
