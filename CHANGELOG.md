@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.2.0"></a>
+## [2.2.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.2.0) (2025-06-20)
+
+### Features
+
+* **ListCommand:** add list command for listing downloaded musics ([a164b54](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/a164b542b8243f1d7145d0aa2461196270953777))
+
 <a name="2.1.1"></a>
 ## [2.1.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.1.1) (2025-06-20)
 
