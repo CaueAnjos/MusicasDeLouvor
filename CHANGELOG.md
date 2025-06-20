@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.1.0"></a>
+## [2.1.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.1.0) (2025-06-20)
+
+### Features
+
+* **tool:** transform LouvorHelper into a dotnet tool ([1ba8e10](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/1ba8e10fff3b9e8ca46a1ca0503dc859345733bc))
+
 <a name="2.0.0"></a>
 ## [2.0.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.0.0) (2025-06-20)
 
