@@ -8,6 +8,8 @@
         <Version>2.1.0</Version>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>lyric</ToolCommandName>
+        <AssemblyName>lyric</AssemblyName>
+        <TargetName>lyric</TargetName>
         <PackageOutputPath>./nupkg</PackageOutputPath>
     </PropertyGroup>
 
