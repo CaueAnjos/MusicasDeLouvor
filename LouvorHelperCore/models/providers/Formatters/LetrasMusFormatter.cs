@@ -17,10 +17,8 @@ public class LetrasMusFormatter : BasicFormatter
             return string.Empty;
 
         string rawLyrics = match.Groups[1].Value;
-        Notify.ObjectDump(rawLyrics);
 
         rawLyrics = base.Format(rawLyrics);
-        Notify.ObjectDump(rawLyrics);
         return rawLyrics;
     }
 }
