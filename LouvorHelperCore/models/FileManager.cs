@@ -7,17 +7,30 @@ public class FileManager
 {
     public FileManager()
     {
-        DownloadPath = Path.GetFullPath("../Musics");
-        CompileOutputPath = Path.GetFullPath("../Presentations");
+        AppDataPath = Path.GetFullPath(
+            Path.Join(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "LouvorHelper"
+            )
+        );
+        InitializeDirectory(AppDataPath);
+
+        DownloadPath = Path.GetFullPath(Path.Join(AppDataPath, "Downloads"));
+        InitializeDirectory(DownloadPath);
+
+        CompileOutputPath = Path.GetFullPath(Path.Join(AppDataPath, "Compiled"));
+        InitializeDirectory(CompileOutputPath);
 
         _jsonOptions = new JsonSerializerOptions();
         _jsonOptions.WriteIndented = true;
         _jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper;
     }
 
-    public string DownloadPath { get; set; }
-    public string CompileOutputPath { get; set; }
-    private JsonSerializerOptions _jsonOptions;
+    public readonly string AppDataPath;
+    public readonly string DownloadPath;
+    public readonly string CompileOutputPath;
+
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public async Task SaveAsync(Music music)
     {
@@ -55,10 +68,15 @@ public class FileManager
         }
     }
 
-    public void Clear(string directory)
+    public void InitializeDirectory(string directory)
     {
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
+    }
+
+    public void Clear(string directory)
+    {
+        InitializeDirectory(directory);
         Directory.Delete(directory, true);
         Directory.CreateDirectory(directory);
     }
