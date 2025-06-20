@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.0.0"></a>
+## [2.0.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.0.0) (2025-06-20)
+
+### Features
+
+* **FileManager:** change DownloadPath and CompileOutputPath to put then in AppData special folder ([06f4382](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/06f438236839a97db6db9580e085925acc04cfac))
+
+### Bug Fixes
+
+* **LetrasMusFormatter:** remove Notify.ObjectDump for lyrics ([5017a94](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/5017a94c87f5b9529c21c0bd0c85ff1a76d083d6))
+* **Musics/Presentatios:** remove both directorys ([7b20d92](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/7b20d92303290d2de658bbde942d61c96a368b15))
+
+### Breaking Changes
+
+* **FileManager:** change DownloadPath and CompileOutputPath to put then in AppData special folder ([06f4382](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/06f438236839a97db6db9580e085925acc04cfac))
+
 <a name="1.5.1"></a>
 ## [1.5.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v1.5.1) (2025-06-17)
 
