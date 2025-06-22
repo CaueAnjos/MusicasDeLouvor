@@ -7,10 +7,28 @@
         <Nullable>enable</Nullable>
         <Version>2.3.3</Version>
         <PackAsTool>true</PackAsTool>
+
         <ToolCommandName>lyric</ToolCommandName>
         <AssemblyName>lyric</AssemblyName>
         <TargetName>lyric</TargetName>
         <PackageOutputPath>../nupkg</PackageOutputPath>
+        <PackageId>LouvorHelper</PackageId>
+        <Version>2.3.2</Version>
+        <Authors>CaueAnjos</Authors>
+        <Owners>CaueAnjos</Owners>
+        <Description>A tool for those who want to download and create presentations easily.</Description>
+
+        <ProjectUrl>https://github.com/CaueAnjos/MusicasDeLouvor</ProjectUrl>
+        <RepositoryUrl>https://github.com/CaueAnjos/MusicasDeLouvor</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <!-- Legal and Metadata -->
+        <Copyright>Copyright © 2025 CaueAnjos</Copyright>
+        <PackageTags>music;lyrics;audio;parsing</PackageTags>
+
+        <!-- README and License (if you have them) -->
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
