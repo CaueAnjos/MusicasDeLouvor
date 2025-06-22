@@ -10,7 +10,7 @@
         <ToolCommandName>lyric</ToolCommandName>
         <AssemblyName>lyric</AssemblyName>
         <TargetName>lyric</TargetName>
-        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <PackageOutputPath>../nupkg</PackageOutputPath>
     </PropertyGroup>
 
     <ItemGroup>

@@ -7,7 +7,7 @@ from pathlib import Path
 # Configuration
 project_path = "."  # path to your .NET project or solution file
 configuration = "Release"
-output_base_dir = "publish_output"
+output_base_dir = "../publish_output"
 compressed_output_dir = os.path.join(output_base_dir, "compressed_builds")
 
 # List of target runtimes (RIDs) to publish for
