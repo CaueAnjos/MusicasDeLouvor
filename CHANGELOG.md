@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.3.1"></a>
+## [2.3.1](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.3.1) (2025-06-21)
+
+### Bug Fixes
+
+* **packaging:** remove nupkg and publish_output folders from been tracked by git ([7d48c5a](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/7d48c5afc36bcfc901435f65f51e0d21aafd0b29))
+
 <a name="2.3.0"></a>
 ## [2.3.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.3.0) (2025-06-21)
 
