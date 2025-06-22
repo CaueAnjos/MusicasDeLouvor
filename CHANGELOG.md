@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.3.3"></a>
+## [2.3.3](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.3.3) (2025-06-21)
+
+### Bug Fixes
+
+* **packaging:** add README and LICENSE to the package ([cdea3c9](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/cdea3c9d21609bf17b276da766ba3992f99320ed))
+
 <a name="2.3.2"></a>
 ## [2.3.2](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.3.2) (2025-06-21)
 
