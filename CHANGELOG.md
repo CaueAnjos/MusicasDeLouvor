@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.4.0"></a>
+## [2.4.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.4.0) (2025-06-26)
+
+### Features
+
+* **colors:** add colors and animations to CLI ([771be3a](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/771be3a81b502ae26731d6460e64892fc31cdf85))
+
 <a name="2.3.4"></a>
 ## [2.3.4](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.3.4) (2025-06-21)
 
