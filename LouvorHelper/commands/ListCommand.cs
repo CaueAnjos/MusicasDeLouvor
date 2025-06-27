@@ -1,6 +1,7 @@
 using System.CommandLine;
 using LouvorHelperCore.Models;
 using LouvorHelperCore.Utils;
+using Spectre.Console;
 
 namespace LouvorHelper.Commands;
 
@@ -21,18 +22,18 @@ internal class ListCommand : Command
 
         await foreach (Music music in fileManager.LoadAsync())
         {
-            Notify.Info(enumerate ? GetMessage(count, music) : GetMessage(music));
+            AnsiConsole.MarkupLine(enumerate ? GetMessage(count, music) : GetMessage(music));
             count++;
         }
     }
 
     private string GetMessage(int index, Music music)
     {
-        return $"({index}) {music.Title} - {music.Artist}";
+        return $"[yellow]({index})[/] [cyan]{music.Title}[/] [gray]({music.Artist})[/]";
     }
 
     private string GetMessage(Music music)
     {
-        return $"{music.Title} - {music.Artist}";
+        return $"[yellow]- [/] [cyan]{music.Title}[/] [gray]({music.Artist})[/]";
     }
 }

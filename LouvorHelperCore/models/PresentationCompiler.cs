@@ -42,7 +42,6 @@ public class PresentationCompiler
         PresentationDocument presentation = new(music);
         presentation.SetTemplate(TemplatePath);
         presentation.Save(filePath);
-        Notify.Success($"Compilado com sucesso: {Path.GetFileName(filePath)}");
     }
 
     public async Task CompileQueueAsync()
@@ -76,14 +75,9 @@ public class PresentationCompiler
     {
         await foreach (Music music in FileManager.LoadAsync())
         {
-            Notify.Info($"Compilando {music.Title} - {music.Artist}");
             Musics.Enqueue(music);
         }
 
         await CompileQueueAsync();
-
-        Notify.Success(
-            $"Compilação concluída! {Musics.Count} apresentações criadas em '{FileManager.CompileOutputPath}'"
-        );
     }
 }

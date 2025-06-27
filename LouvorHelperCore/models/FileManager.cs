@@ -54,6 +54,15 @@ public class FileManager
         return null;
     }
 
+    public IEnumerable<string> GetMusicFiles()
+    {
+        foreach (string fileName in Directory.EnumerateFiles(DownloadPath))
+        {
+            if (fileName is not null)
+                yield return fileName;
+        }
+    }
+
     public async IAsyncEnumerable<Music> LoadAsync()
     {
         if (!Directory.Exists(DownloadPath))

@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.Text;
 using LouvorHelperCore.Models;
 using LouvorHelperCore.Utils;
+using Spectre.Console;
 
 namespace LouvorHelper.Commands;
 
@@ -10,20 +11,11 @@ internal class MedleyCommand : Command
     public MedleyCommand()
         : base("medley", "Cria um medley das musicas especificadas")
     {
-        Option<List<FileInfo>> filesForMedleyOption = new(
-            ["--files-for-medley", "--files", "-f"],
-            "Os de musica (.json) para o medley"
-        )
-        {
-            IsRequired = true,
-        };
-
         Option<string?> authorOption = new(
             ["--author", "--autor", "-a"],
             "define o autor do medley"
         );
-        AddOption(filesForMedleyOption);
-        this.SetHandler(CommandAction, filesForMedleyOption, authorOption);
+        this.SetHandler(CommandAction, authorOption);
     }
 
     bool NotifyErrorAndConfirm(string message)
@@ -32,63 +24,83 @@ internal class MedleyCommand : Command
         return Notify.YesNoBox("Deseja continuar com outro arquivo?", true);
     }
 
-    private async Task CommandAction(List<FileInfo> filesForMedley, string? author)
+    private async Task CommandAction(string? author)
     {
-        if (filesForMedley.Count <= 1)
-        {
-            Notify.Error("Nenhum arquivo foi especificado");
-            return;
-        }
-
         FileManager fileManager = new();
         author ??= "LouvorHelper";
 
         var lyricsBuilder = new StringBuilder();
         var titleBuilder = new StringBuilder("(Medley) ");
 
-        foreach (FileInfo file in filesForMedley)
+        var musics = fileManager.GetMusicFiles().ToList();
+
+        var musicsForMedley = AnsiConsole.Prompt(
+            new MultiSelectionPrompt<string>()
+                .Title("Select [green]musics[/] to include in the [cyan]medley[/]")
+                .PageSize(10)
+                .MoreChoicesText("[grey](Move up and down to reveal more musics)[/]")
+                .InstructionsText(
+                    "[grey](Press [blue]<space>[/] to toggle a music, "
+                        + "[green]<enter>[/] to accept)[/]"
+                )
+                .AddChoices(musics)
+        );
+
+        foreach (string fileName in musicsForMedley)
         {
-            if (file.Extension != ".json")
-            {
-                if (!NotifyErrorAndConfirm($"O arquivo {file.Name} não é um arquivo JSON"))
-                    return;
-                continue;
-            }
-
-            if (file.Length == 0)
-            {
-                if (!NotifyErrorAndConfirm($"{file.Name} está vazio"))
-                    return;
-                continue;
-            }
-
-            Music? musicFromFile = await fileManager.LoadAsync(file.FullName);
+            Music? musicFromFile = await fileManager.LoadAsync(fileName);
             if (musicFromFile is null)
             {
-                if (
-                    !NotifyErrorAndConfirm(
-                        $"Não foi possível carregar o arquivo {file.Name}. Talvez ele não contenha uma música no formato válido."
-                    )
-                )
-                    return;
-                continue;
-            }
+                AnsiConsole.MarkupLine($"[red]Não foi possível carregar o arquivo {fileName}[/]");
+                var confirmation = AnsiConsole.Prompt(
+                    new TextPrompt<bool>("Want to continue with out this file?")
+                        .AddChoice(true)
+                        .AddChoice(false)
+                        .DefaultValue(true)
+                        .WithConverter(choice => choice ? "y" : "n")
+                );
 
-            lyricsBuilder.AppendLine(musicFromFile.Lyrics).AppendLine();
-            titleBuilder.Append(musicFromFile.Title).Append('+');
+                if (!confirmation)
+                    break;
+            }
+            else
+            {
+                lyricsBuilder.AppendLine(musicFromFile.Lyrics).AppendLine();
+                titleBuilder.Append(musicFromFile.Title).Append('+');
+            }
         }
 
-        if (lyricsBuilder.Length == 0 || titleBuilder.Length <= "(Medley) ".Length)
+        if (musicsForMedley.Count < 2)
         {
-            Notify.Error("Nenhum arquivo válido foi processado para criar o medley.");
+            AnsiConsole.MarkupLine("[red]No valid file was processed to create the medley.[/]");
             return;
         }
 
         string finalTitle = titleBuilder.ToString().TrimEnd('+');
         string finalLyrics = lyricsBuilder.ToString().Trim();
 
-        Music medley = new(finalTitle, author, finalLyrics);
-        await fileManager.SaveAsync(medley);
-        Notify.Success($"Arquivo salvo em: {fileManager.DownloadPath}");
+        var panel = new Panel($"[gray]{finalLyrics}[/]\n");
+        panel.Border(BoxBorder.Rounded);
+        panel.Header("lyrics");
+        AnsiConsole.Write(panel);
+
+        var confimationMedley = AnsiConsole.Prompt(
+            new TextPrompt<bool>("Want to continue with this [cyan]medley[/]?")
+                .AddChoice(true)
+                .AddChoice(false)
+                .DefaultValue(true)
+                .WithConverter(choice => choice ? "y" : "n")
+        );
+
+        if (confimationMedley)
+        {
+            Music medley = new(finalTitle, author, finalLyrics);
+            await fileManager.SaveAsync(medley);
+            AnsiConsole.MarkupLine($"[green]File saved at: {fileManager.DownloadPath}[/]");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("[red]Medley not saved.[/]");
+        }
     }
 }

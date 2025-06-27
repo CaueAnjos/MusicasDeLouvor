@@ -13,7 +13,6 @@
         <TargetName>lyric</TargetName>
         <PackageOutputPath>../nupkg</PackageOutputPath>
         <PackageId>LouvorHelper</PackageId>
-        <Version>2.3.2</Version>
         <Authors>CaueAnjos</Authors>
         <Owners>CaueAnjos</Owners>
         <Description>A tool for those who want to download and create presentations easily.</Description>
@@ -41,6 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Spectre.Console" Version="0.50.0" />
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     </ItemGroup>
 

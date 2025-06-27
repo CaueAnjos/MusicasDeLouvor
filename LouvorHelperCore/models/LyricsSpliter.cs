@@ -11,7 +11,7 @@ internal static class LyricsSplitter
     /// <param name="lyrics">The full lyrics text</param>
     /// <param name="maxLinesPerSlide">Maximum number of lines per slide (default: 8)</param>
     /// <returns>List of lyric sections</returns>
-    public static List<string> SplitLyrics(string lyrics, int maxLinesPerSlide = 8)
+    public static List<string> SplitLyrics(string lyrics, int maxLinesPerSlide = 5)
     {
         var sections = new List<string>();
         if (string.IsNullOrWhiteSpace(lyrics))

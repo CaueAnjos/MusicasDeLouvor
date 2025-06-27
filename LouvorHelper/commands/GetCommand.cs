@@ -2,6 +2,8 @@ using System.CommandLine;
 using LouvorHelperCore.Models;
 using LouvorHelperCore.Models.Providers;
 using LouvorHelperCore.Utils;
+using Spectre.Console;
+using Spectre.Console.Extensions;
 
 namespace LouvorHelper.Commands;
 
@@ -33,58 +35,78 @@ internal class GetCommand : Command
 
     private async Task CommandAction(string title, string author, bool autoCompile)
     {
-        Notify.Info($"Buscando letra para: {title} {"de " + author}");
-
         ProviderContainer providerContainer = new(
             [new VagalumeProvider(), new CifraClubProvider(), new LetrasMusProvider()]
         );
-        await providerContainer.GetLyricsAsync(title, author);
+        await providerContainer.GetLyricsAsync(title, author).Spinner();
 
         string? lyrics = SelectProvider(providerContainer);
 
         if (lyrics is not null)
         {
-            Notify.Success("Letra encontrada");
+            var panel = new Panel($"[gray]{lyrics}[/]\n");
+            panel.Border(BoxBorder.Rounded);
+            panel.Header("lyrics");
+            AnsiConsole.Write(panel);
+
+            var confimation = AnsiConsole.Prompt(
+                new TextPrompt<bool>("Want to continue with this [cyan]music[/]?")
+                    .AddChoice(true)
+                    .AddChoice(false)
+                    .DefaultValue(true)
+                    .WithConverter(choice => choice ? "y" : "n")
+            );
+
+            if (!confimation)
+            {
+                AnsiConsole.MarkupLine("[red]Music not saved.[/]");
+                return;
+            }
 
             Music music = new(title, author, lyrics);
             FileManager fileManager = new();
             await fileManager.SaveAsync(music);
 
-            Notify.Success($"Arquivo salvo em: {fileManager.DownloadPath}");
+            AnsiConsole.MarkupLine($"[gray]Saved at: {fileManager.DownloadPath}[/]");
 
             if (autoCompile)
             {
                 PresentationCompiler compiler = new();
                 compiler.CompileMusic(music);
-                Notify.Success($"{music.Title} was compiled");
             }
+
+            AnsiConsole.MarkupLine("[green]Done![/]");
         }
-        else
-            Notify.Error("Letra não encontrada");
     }
 
     private string? SelectProvider(ProviderContainer container)
     {
         if (container.GoodProvidersResponse == 0)
-            return null;
-
-        if (container.GoodProvidersResponse == 1)
-            return container.GetDefaultLyrics();
-
-        foreach (var result in container.Lyrics)
         {
-            if (result.Value is null)
-                Notify.Info($"{result.Key}");
-            else
-                Notify.Success($"{result.Key}");
+            AnsiConsole.MarkupLine($"[red]Lyrics not found[/]");
+            return null;
         }
 
-        Notify.Info("Qual você deseja usar?");
-        string? choice = Console.ReadLine();
-
-        if (!string.IsNullOrEmpty(choice) && container.Lyrics.ContainsKey(choice))
-            return container.Lyrics[choice];
-        else
+        if (container.GoodProvidersResponse == 1)
+        {
+            AnsiConsole.MarkupLine("[cyan]Using default provider[/]");
             return container.GetDefaultLyrics();
+        }
+
+        string choice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Which [cyan]provider[/] do you want to use?")
+                .PageSize(3)
+                .AddChoices(
+                    container
+                        .Lyrics.Where(k => !string.IsNullOrEmpty(k.Value))
+                        .Select(k => k.Key)
+                        .OrderBy(k => k)
+                )
+        );
+
+        AnsiConsole.MarkupLine($"Using [cyan]{choice}[/]");
+
+        return container.Lyrics[choice];
     }
 }

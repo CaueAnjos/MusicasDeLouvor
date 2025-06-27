@@ -26,8 +26,8 @@ public class ProviderContainer
 
     public string? GetDefaultLyrics()
     {
-        return Lyrics.FirstOrDefault(t => t.Value is not null).Value;
+        return Lyrics.FirstOrDefault(t => !string.IsNullOrEmpty(t.Value)).Value;
     }
 
-    public int GoodProvidersResponse => Lyrics.Count(t => t.Value is not null);
+    public int GoodProvidersResponse => Lyrics.Count(t => !string.IsNullOrEmpty(t.Value));
 }
