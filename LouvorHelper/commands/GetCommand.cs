@@ -25,15 +25,27 @@ internal class GetCommand : Command
             getDefaultValue: () => true,
             "Compila automaticamente as apresentações"
         );
+        var capslockOption = new Option<bool>(
+            ["--upper", "--fixa", "-U"],
+            getDefaultValue: () => false,
+            "Deixa as letras maiúsculas"
+        );
 
         AddOption(titleOption);
         AddOption(authorOption);
         AddOption(autoCompileOption);
+        AddOption(capslockOption);
 
-        this.SetHandler(CommandAction, titleOption, authorOption, autoCompileOption);
+        this.SetHandler(
+            CommandAction,
+            titleOption,
+            authorOption,
+            autoCompileOption,
+            capslockOption
+        );
     }
 
-    private async Task CommandAction(string title, string author, bool autoCompile)
+    private async Task CommandAction(string title, string author, bool autoCompile, bool capslock)
     {
         ProviderContainer providerContainer = new(
             [new VagalumeProvider(), new CifraClubProvider(), new LetrasMusProvider()]
@@ -44,6 +56,11 @@ internal class GetCommand : Command
 
         if (lyrics is not null)
         {
+            if (capslock)
+            {
+                lyrics = lyrics.ToUpper();
+            }
+
             var panel = new Panel($"[gray]{lyrics}[/]\n");
             panel.Border(BoxBorder.Rounded);
             panel.Header("lyrics");
