@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="2.5.0"></a>
+## [2.5.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.5.0) (2025-08-10)
+
+### Features
+
+* **spliter:** add separetion per section ([db6a335](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/db6a335e697c89902f02fcae6ddc8090aae28490))
+* **upper:** add -U option for upper casing lyrics ([822cfd0](https://www.github.com/CaueAnjos/MusicasDeLouvor/commit/822cfd0c5822a482cddd94f5ab0c6e01b4a4322d))
+
 <a name="2.4.0"></a>
 ## [2.4.0](https://www.github.com/CaueAnjos/MusicasDeLouvor/releases/tag/v2.4.0) (2025-06-26)
 
