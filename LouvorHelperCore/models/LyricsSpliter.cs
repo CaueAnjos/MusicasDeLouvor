@@ -17,7 +17,7 @@ internal static class LyricsSplitter
         if (string.IsNullOrWhiteSpace(lyrics))
             return sections;
 
-        var lines = lyrics.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
+        var lines = lyrics.Split(['\n', '\r'], StringSplitOptions.TrimEntries);
         var currentSection = new List<string>();
 
         foreach (var line in lines)
@@ -33,7 +33,7 @@ internal static class LyricsSplitter
             }
             else
             {
-                currentSection.Add(line.Trim());
+                currentSection.Add(line);
 
                 // If section gets too long, split it
                 if (currentSection.Count >= maxLinesPerSlide)
